@@ -53,3 +53,8 @@ def mkdir(dirname, ui = True):
     else:
         print("[mkdir] " + dirname + " is already exists.")
 
+# ファイルの中身をまっさらにする
+def file_clear(filepath, ui = True):
+    with open(filepath, mode="rw") as f:
+        f.truncate(0)
+
