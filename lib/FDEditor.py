@@ -4,7 +4,11 @@
 # ファイル・ディレクトリを操作
 
 import PathEditor as pe
-import cv2
+CV2 = True
+try:
+    import cv2
+except ModuleNotFoundError:
+    CV2 = False
 import os
 import requests
 
@@ -13,17 +17,21 @@ def file2list(filename):
     with open(filename) as f:
         lines = []
         for line in f:
-            lines.append(line)
+            string = line.replace("\n", "")
+            if not len(string) == 0:
+                lines.append(string)
     return lines
 
 # 画像をコンバートする
 def convertor(filepath, ui = True):
+    global CV2
     ext = pe.get_ext(filepath)
     if pe.isimage(ext, ui = ui):
         # 画像のときは画像変換
         if ui :
             print("[converting] " + filepath)
-        cv2.imwrite(filepath, cv2.imread(filepath))
+        if CV2:
+            cv2.imwrite(filepath, cv2.imread(filepath))
         if ui :
             print("[converted] " + filepath)
     else:
@@ -52,4 +60,24 @@ def mkdir(dirname, ui = True):
             print("[mkdir] mkdir -r " + dirname)
     else:
         print("[mkdir] " + dirname + " is already exists.")
+
+# ファイルの中身をまっさらにする
+def file_clear(filepath, ui = True):
+    with open(filepath, mode="w") as f:
+        f.truncate(0)
+
+# 空のファイルを作成する
+def touch(filepath, ui = True):
+    if not os.path.exists(filepath):
+        with open(filepath, mode = "w") as f:
+            f.truncate(0)
+    else:
+        if ui:
+            print("[touch] " + str(filepath) + " is already exists.")
+
+# ディレクトリ内のディレクトリやファイルの拡張子あり名前を取得する
+def get_listdir(dir_path):
+    ld = os.listdir(dir_path)
+    ld.sort()
+    return ld
 
