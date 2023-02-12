@@ -75,9 +75,12 @@ def touch(filepath, ui = True):
         if ui:
             print("[touch] " + str(filepath) + " is already exists.")
 
+<<<<<<< HEAD
 # ディレクトリ内のディレクトリやファイルの拡張子あり名前を取得する
 def get_listdir(dir_path):
     ld = os.listdir(dir_path)
     ld.sort()
     return ld
 
+=======
+>>>>>>> a0a6965975bd8661e3d69fb137bdfc7053285b2a
