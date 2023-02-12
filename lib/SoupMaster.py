@@ -13,9 +13,12 @@ import requests
 # アドレスの BeautifulSoup を返す
 def get_soup(address, ui = True):
     try:
+        # ユーザエージェントの偽装
+        headers = {"User-Agent" : "camouflage useragent"}
+        req = request.Request(url = address, headers = headers)
         # レスポンスの情報を管理するオブジェクトを返す
         # このオブジェクトからメソッドを呼び出して必要な情報を取り出す
-        with request.urlopen(address) as response:
+        with request.urlopen(req) as response:
             time.sleep(0.5)
             # 取得した文字列をまとめて取り出す
             body = response.read()
