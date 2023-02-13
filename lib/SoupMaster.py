@@ -30,12 +30,12 @@ def get_soup(address, ui = True):
                 cs = chardet.detect(body)   # {'encoding': 'ascii', 'confidence': 1.0, 'language': ''}
                 data = body.decode(cs['encoding'])
                 # BeautifulSoup オブジェクトの作成
-                soup = BeautifulSoup(data, 'lxml')
+                soup = BeautifulSoup(data, 'html.parser')
                 return soup
             except UnicodeDecodeError:
                 data = body
                 # BeautifulSoup オブジェクトの作成
-                soup = BeautifulSoup(data, 'lxml')
+                soup = BeautifulSoup(data, 'html.parser')
                 return soup
     except (urllib.error.URLError, urllib.error.HTTPError) as e:
         if ui :
