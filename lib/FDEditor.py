@@ -23,32 +23,33 @@ def file2list(filename):
     return lines
 
 # 画像をコンバートする
-def convertor(filepath, ui = True):
+def convertor(src_path, build_path, ui = True):
     global CV2
-    ext = pe.get_ext(filepath)
+    ext = pe.get_ext(src_path)
     if pe.isimage(ext, ui = ui):
         # 画像のときは画像変換
         if ui :
-            print("[converting] " + filepath)
+            print("[converting] " + src_path)
         if CV2:
-            cv2.imwrite(filepath, cv2.imread(filepath))
+            cv2.imwrite(build_path, cv2.imread(src_path))
         if ui :
-            print("[converted] " + filepath)
+            print("[converted] " + build_path)
     else:
         # 画像ではないときはスキップ
         if ui :
-            print("[skip] " + filepath + " is not image.")
+            print("[skip] " + src_path + " is not image.")
 
 # ディレクトリ内の画像ファイルをコンバートする
-def convert_indir(download_dir, ui = True):
+def convert_indir(download_dir, ext = ".png", ui = True):
     # download_dir 内のファイル名のリストを取得
     image_names = os.listdir(download_dir)
     image_names.sort()
     for image_name in image_names:
         image_name_split = os.path.splitext(os.path.basename(image_name))[0]
         # ファイル名とディレクトリ名からパスを生成
-        filepath = download_dir + image_name_split + ".png"
-        convertor(filepath, ui = ui)
+        src = download_dir + image_name
+        build = download_dir + image_name_split + ext
+        convertor(src, build, ui = ui)
 
 # ディレクトリ作成
 def mkdir(dirname, ui = True):
