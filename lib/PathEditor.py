@@ -37,14 +37,14 @@ def cut_prefix(string, prefix, ui = True):
     return res
 
 # スラッシュをパイプに変えて長い文字列を短くする
-def path_short(path, namelength_ = NAMELENGTH, ui = True):
+def path_short(path, namelength = NAMELENGTH, ui = True):
     ext = get_ext(path, ui = False)
     # スラッシュをパイプに置き換える
     path_opt = path.replace("/", "|")
-    namelength = namelength_ - len(ext)
+    namelength_ = namelength - len(ext)
     # ファイル名が長くなったときに短くする
-    if len(path_opt) >= namelength:
-        path_opt = path_opt[:namelength]
+    if len(path_opt) >= namelength_:
+        path_opt = path_opt[:namelength_]
         path_opt = path_opt + ext
     return path_opt
 

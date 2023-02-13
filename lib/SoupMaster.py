@@ -9,6 +9,7 @@ from urllib import request
 import chardet
 from bs4 import BeautifulSoup
 import requests
+import sys
 
 # アドレスの BeautifulSoup を返す
 def get_soup(address, ui = True):
@@ -42,12 +43,17 @@ def get_soup(address, ui = True):
         time.sleep(0.5)
         get_soup(address, ui)
 
-# 特定クラス名を持つ div タグの要素を取得
-def get_divs(soup, div_class, ui = True):
-    lists = soup.find_all(class_ = div_class)
+# 特定クラス名を持つタグの要素を取得
+def get_tags_from_class(soup, class_, tag = "div", ui = True):
+    lists = soup.find_all(tag, class_ = class_)
     return lists
 
-# 特定のクラス名を持つ anchor タグの href 属性内容を取得
+# 特定の ID 名を持つタグの要素を取得
+def get_tags_from_id(soup, id, tag = "div", ui = True):
+    lists = soup.find_all(tag, id = id)
+    return lists
+
+# <a class = anchor_class href = "***" ></a>
 def get_hrefs(soup, anchor_class, ui = True):
     lists = soup.find_all(class_ = anchor_class)
     hrefs = []
@@ -56,6 +62,14 @@ def get_hrefs(soup, anchor_class, ui = True):
         if ui:
             print("[append] " + str(li['href']))
     return hrefs
+
+# <tag class = tag_class><a href = "***"></a></tag>
+def get_hrefs_from_tag_in_anchor(soup, tag_class, tag = "div", ui = True):
+    # tag_class を持つ tag のリストを取得する
+    lists = get_tags_from_class(soup, class_ = tag_class, tag = tag, ui = ui)
+    if ui:
+        print("[get] ", lists)
+    return lists
 
 # bs4.BeautifulSoup 型にして返す
 def elementTag2BeautifulSoup(data, ui = True):
@@ -75,8 +89,8 @@ def exist_href(soup, anchor_class, ui = True):
 # URL の画像を表示する
 def show_image(url : str, title : str, scaling = 1, ui = True):
     try:
+        time.sleep(1)
         with requests.get(url, stream = True).raw as resp:
-            time.sleep(0.5)
             image = np.asarray(bytearray(resp.read()), dtype = "uint8")
             image = cv2.imdecode(image, cv2.IMREAD_COLOR)
             rescale_size = scaling
@@ -104,7 +118,18 @@ def get_image_urls(soup, anchor_class, ui = True):
 
 # ファイルの種類によらず保存する
 def file_download(url, filename, ui = True):
-    r = requests.get(url, stream = True)
+    roop = True
+    # ヘッダ偽造
+    headers = {"User-Agent" : "Mozilla/5.0 (Windows NT 10.0; Win64; x64) Apple WebKit/537.36 (KHTML, like Gecko) Chrome/78.9.3904.97 Safari/537.36"}
+    while roop:
+        try:
+            time.sleep(5)
+            r = requests.get(url, stream = True, headers = headers)
+            roop = False
+        except TimeoutError:
+            file_download(url, filename, ui)
+            print("[TimeoutError] Retry ... ")
+            roop = True
     with open(filename, 'wb') as f:
         for chunk in r.iter_content(chunk_size = 1024):
             if chunk:

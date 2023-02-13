@@ -45,8 +45,9 @@ def convert_indir(download_dir, ui = True):
     image_names = os.listdir(download_dir)
     image_names.sort()
     for image_name in image_names:
+        image_name_split = os.path.splitext(os.path.basename(image_name))[0]
         # ファイル名とディレクトリ名からパスを生成
-        filepath = download_dir + "/" + image_name
+        filepath = download_dir + image_name_split + ".png"
         convertor(filepath, ui = ui)
 
 # ディレクトリ作成
@@ -81,3 +82,15 @@ def get_listdir(dir_path):
     ld.sort()
     return ld
 
+# ファイルに文字列を保存
+def create_file(filepath, text, ui = True):
+    with open(filepath, "w") as f:
+        f.write(str(text))
+        if ui:
+            print("[write] " + filepath)
+            print(" >>> \r\n" + text, end = "\r\n <<< \r\n")
+
+# ファイルパスからファイル名（拡張子あり）を取得する
+def path2name(filepath, ui = True):
+    filename = os.path.basename(filepath)
+    return filename
