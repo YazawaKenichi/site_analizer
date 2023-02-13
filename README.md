@@ -15,6 +15,10 @@
 
 まだまだアップデートする余地はあるし、アップデートしていく。
 
+# 動作環境
+- 
+- 
+
 # 使い方
 1. 任意の場所にこのリポジトリをクローン
     ```
@@ -46,6 +50,8 @@
     import SoupMaster
     import StringEditor
     ```
+
+詳しいリファレンスは [lib/README.md](https://github.com/yazawakenichi/site_analizer/tree/main/lib) 参照
 
 # 参考サイト
 - [requests モジュールでダウンロードに失敗するときの対策方法 - GAMMASOFT](https://gammasoft.jp/support/solutions-of-requests-get-failed/)
