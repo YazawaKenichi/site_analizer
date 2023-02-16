@@ -135,5 +135,4 @@ def file_download(url, filename, ui = True):
             if chunk:
                 f.write(chunk)
                 f.flush()
-    if ui :
 
