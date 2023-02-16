@@ -136,5 +136,4 @@ def file_download(url, filename, ui = True):
                 f.write(chunk)
                 f.flush()
     if ui :
-        print("[write] " + url + " -> " + filename)
 
