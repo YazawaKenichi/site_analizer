@@ -23,10 +23,7 @@ def get_basename(path, ui = False):
 def get_ext(path, ui = False):
     res = ""
     dot_index = path.find(".")
-    if not dot_index == 0:
-        res = os.path.splitext(path)[1]
-    else:
-        res = os.path.splitext(path)[0]
+    res = os.path.splitext(path)[-1]
     if ui:
         print("[splitext] ", os.path.splitext(path))
     return str(res)
