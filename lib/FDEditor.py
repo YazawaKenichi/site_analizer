@@ -25,8 +25,7 @@ def file2list(filename):
 # 画像をコンバートする
 def convertor(src_path, build_path, ui = True):
     global CV2
-    ext = pe.get_ext(src_path)
-    if pe.isimage(ext, ui = ui):
+    if pe.isimage(src_path, ui = ui):
         # 画像のときは画像変換
         if ui :
             print("[converting] " + src_path)

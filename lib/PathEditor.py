@@ -50,9 +50,7 @@ def isimage(path, ui = True):
     imageexies = [".jpg", ".jpeg", ".png", ".ping", ".webp", ".jfif"]
     ext = get_ext(path, ui = False)
     if ui:
-        print("[compare] " + "path : " + path + " | ext : " + get_ext(path, ui = False) + " is image : ", ext in imageexies)
-    res = False
-    if ext in imageexies:
-        res = True
-    return res
+        msg = f"[compare] path : {path} | ext : {ext} | {ext in imageexies}"
+        print(msg)
+    return ext in imageexies
 
