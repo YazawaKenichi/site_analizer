@@ -10,33 +10,26 @@ import chardet
 from bs4 import BeautifulSoup
 import requests
 import sys
+import cv2
+import tempfile
 
 # アドレスの BeautifulSoup を返す
 def get_soup(address, ui = True):
     try:
         # ユーザエージェントの偽装
-        headers = {"User-Agent" : "camouflage useragent"}
-        req = request.Request(url = address, headers = headers)
+        user_agent = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.114 Safari/537.36'
+        header = { "User-Agent" : user_agent }
         # レスポンスの情報を管理するオブジェクトを返す
         # このオブジェクトからメソッドを呼び出して必要な情報を取り出す
-        with request.urlopen(req) as response:
+        with requests.get(address, headers = header) as response:
             time.sleep(0.5)
             # 取得した文字列をまとめて取り出す
-            body = response.read()
+            body = response.content
+            data = body
             if ui:
                 print("[open] " + address)
-            try:
-                # 文字コードの取得
-                cs = chardet.detect(body)   # {'encoding': 'ascii', 'confidence': 1.0, 'language': ''}
-                data = body.decode(cs['encoding'])
-                # BeautifulSoup オブジェクトの作成
-                soup = BeautifulSoup(data, 'html.parser')
-                return soup
-            except UnicodeDecodeError:
-                data = body
-                # BeautifulSoup オブジェクトの作成
-                soup = BeautifulSoup(data, 'html.parser')
-                return soup
+            soup = BeautifulSoup(data, "html.parser")
+            return soup
     except (urllib.error.URLError, urllib.error.HTTPError) as e:
         if ui :
             print("\x1b[31m" + address + " : Time Out!" + "\x1b[0m", file = sys.stderr)
@@ -136,4 +129,21 @@ def file_download(url, filename, ui = True):
             if chunk:
                 f.write(chunk)
                 f.flush()
+
+# 特定のタグ内の要素を取り出す
+def get_elements(soup, tag):
+    elements = soup.find_all(tag)
+    return elements
+
+# URL の画像を cv2 の型で取得
+def urlread(url):
+    # 画像をリクエスト
+    res = requests.get(url)
+    img = None
+    # 一時ファイルを作成
+    with tempfile.NamedTemporaryFile(dir = "./") as fp:
+        fp.write(res.content)
+        fp.file.seek(0)
+        img = cv2.imread(fp.name)
+    return img
 

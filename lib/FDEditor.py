@@ -13,14 +13,19 @@ import os
 import requests
 
 # ファイル名から一行ずつリストに格納
-def file2list(filename):
+def file2list(filename, additional = []):
     with open(filename) as f:
         lines = []
         for line in f:
-            string = line.replace("\n", "")
-            if not len(string) == 0:
-                lines.append(string)
-    return lines
+            line = line.replace("\n", "")
+            line = line.replace(" ", "")
+            line = line.split("#")[0]
+            if not line == "":
+                lines.append(line)
+    r_lines = list(dict.fromkeys(lines))
+    if not additional is None:
+        r_lines = additional + r_lines
+    return r_lines
 
 # 画像をコンバートする
 def convertor(src_path, build_path, ui = True):
@@ -94,3 +99,13 @@ def create_file(filepath, text, ui = True):
 def path2name(filepath, ui = True):
     filename = os.path.basename(filepath)
     return filename
+
+# ファイルから一致する行を削除
+def delinefromfile(path, string):
+    tmp_path = "__delinefromfile_template__"
+    with open(path, "r") as input:
+        with open(tmp_path, "w") as output:
+            for line in input:
+                if not string in line.strip("\n"):
+                    output.write(line)
+    os.rename(tmp_path, path)
