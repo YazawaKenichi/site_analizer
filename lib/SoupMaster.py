@@ -138,7 +138,14 @@ def get_elements(soup, tag):
 # URL の画像を cv2 の型で取得
 def urlread(url):
     # 画像をリクエスト
-    res = requests.get(url)
+    loop = True
+    while loop:
+        try:
+            res = requests.get(url)
+            loop = False
+        except requests.exceptions.Timeout:
+            loop = True
+            time.sleep(5)
     img = None
     # 一時ファイルを作成
     with tempfile.NamedTemporaryFile(dir = "./") as fp:

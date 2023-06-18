@@ -65,7 +65,8 @@ def mkdir(dirname, ui = True):
         if ui:
             print("[mkdir] mkdir -r " + dirname)
     else:
-        print("[mkdir] " + dirname + " is already exists.")
+        if ui:
+            print("[mkdir] " + dirname + " is already exists.")
 
 # ファイルの中身をまっさらにする
 def file_clear(filepath, ui = True):
