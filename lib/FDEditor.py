@@ -12,14 +12,19 @@ except ModuleNotFoundError:
 import os
 
 # ファイル名から一行ずつリストに格納
-def file2list(filename):
+def file2list(filename, additional = []):
     with open(filename) as f:
         lines = []
         for line in f:
-            string = line.replace("\n", "")
-            if not len(string) == 0:
-                lines.append(string)
-    return lines
+            line = line.replace("\n", "")
+            line = line.replace(" ", "")
+            line = line.split("#")[0]
+            if not line == "":
+                lines.append(line)
+    r_lines = list(dict.fromkeys(lines))
+    if not additional is None:
+        r_lines = additional + r_lines
+    return r_lines
 
 # ディレクトリ内の画像ファイルをコンバートする
 def convert_indir(download_dir, ext = ".png", ui = True):
@@ -43,7 +48,8 @@ def mkdir(dirname, ui = True):
         if ui:
             print("[mkdir] mkdir -r " + dirname)
     else:
-        print("[mkdir] " + dirname + " is already exists.")
+        if ui:
+            print("[mkdir] " + dirname + " is already exists.")
 
 # ファイルの中身をまっさらにする
 def file_clear(filepath, ui = True):
@@ -85,3 +91,12 @@ def remove(path, trush = "./.trush/"):
     if SHUTIL:
         shutil.move(path, trush)
 
+# ファイルから一致する行を削除
+def delinefromfile(path, string):
+    tmp_path = "__delinefromfile_template__"
+    with open(path, "r") as input:
+        with open(tmp_path, "w") as output:
+            for line in input:
+                if not string in line.strip("\n"):
+                    output.write(line)
+    os.rename(tmp_path, path)

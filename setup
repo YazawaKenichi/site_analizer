@@ -1,0 +1,10 @@
+#!/bin/bash
+
+LIB_NAME="site_analizer"
+EXT="pth"
+SITE_PACKAGES=$(python3 -c 'import site; print(site.getsitepackages()[0])')
+PTH_PATH="$SITE_PACKAGES/$LIB_NAME.$EXT"
+LIB_PATH="$(pwd)/lib"
+
+echo $LIB_PATH > $PTH_PATH
+
