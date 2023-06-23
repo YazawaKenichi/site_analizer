@@ -3,14 +3,13 @@
 # FDEditor.py
 # ファイル・ディレクトリを操作
 
-import PathEditor as pe
-CV2 = True
+SHUTIL = True
 try:
-    import cv2
+    import shutil
 except ModuleNotFoundError:
-    CV2 = False
+    SHUTIL = False
+
 import os
-import requests
 
 # ファイル名から一行ずつリストに格納
 def file2list(filename):
@@ -21,22 +20,6 @@ def file2list(filename):
             if not len(string) == 0:
                 lines.append(string)
     return lines
-
-# 画像をコンバートする
-def convertor(src_path, build_path, ui = True):
-    global CV2
-    if pe.isimage(src_path, ui = ui):
-        # 画像のときは画像変換
-        if ui :
-            print("[converting] " + src_path)
-        if CV2:
-            cv2.imwrite(build_path, cv2.imread(src_path))
-        if ui :
-            print("[converted] " + build_path)
-    else:
-        # 画像ではないときはスキップ
-        if ui :
-            print("[skip] " + src_path + " is not image.")
 
 # ディレクトリ内の画像ファイルをコンバートする
 def convert_indir(download_dir, ext = ".png", ui = True):
@@ -94,3 +77,11 @@ def create_file(filepath, text, ui = True):
 def path2name(filepath, ui = True):
     filename = os.path.basename(filepath)
     return filename
+
+# ディレクトリの削除
+def remove(path, trush = "./.trush/"):
+    global SHUTIL
+    mkdir(trush, ui = False)
+    if SHUTIL:
+        shutil.move(path, trush)
+
