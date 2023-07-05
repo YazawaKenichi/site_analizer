@@ -14,7 +14,7 @@ import cv2
 import tempfile
 
 # アドレスの BeautifulSoup を返す
-def get_soup(address, ui = True):
+def get_soup(address, ui = False):
     try:
         # ユーザエージェントの偽装
         user_agent = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.114 Safari/537.36'
@@ -37,17 +37,17 @@ def get_soup(address, ui = True):
         get_soup(address, ui)
 
 # 特定クラス名を持つタグの要素を取得
-def get_tags_from_class(soup, class_, tag = "div", ui = True):
+def get_tags_from_class(soup, class_, tag = "div", ui = False):
     lists = soup.find_all(tag, class_ = class_)
     return lists
 
 # 特定の ID 名を持つタグの要素を取得
-def get_tags_from_id(soup, id, tag = "div", ui = True):
+def get_tags_from_id(soup, id, tag = "div", ui = False):
     lists = soup.find_all(tag, id = id)
     return lists
 
 # <a class = anchor_class href = "***" ></a>
-def get_hrefs(soup, anchor_class, ui = True):
+def get_hrefs(soup, anchor_class, ui = False):
     lists = soup.find_all(class_ = anchor_class)
     hrefs = []
     for li in lists:
@@ -57,7 +57,7 @@ def get_hrefs(soup, anchor_class, ui = True):
     return hrefs
 
 # <tag class = tag_class><a href = "***"></a></tag>
-def get_hrefs_from_tag_in_anchor(soup, tag_class, tag = "div", ui = True):
+def get_hrefs_from_tag_in_anchor(soup, tag_class, tag = "div", ui = False):
     # tag_class を持つ tag のリストを取得する
     lists = get_tags_from_class(soup, class_ = tag_class, tag = tag, ui = ui)
     if ui:
@@ -65,14 +65,14 @@ def get_hrefs_from_tag_in_anchor(soup, tag_class, tag = "div", ui = True):
     return lists
 
 # bs4.BeautifulSoup 型にして返す
-def elementTag2BeautifulSoup(data, ui = True):
+def elementTag2BeautifulSoup(data, ui = False):
     string = ""
     string = str(data)
     soup = BeautifulSoup(string, 'lxml')
     return soup
 
 # href があるかどうかを判断する
-def exist_href(soup, anchor_class, ui = True):
+def exist_href(soup, anchor_class, ui = False):
     hrefs = get_hrefs(soup, anchor_class, ui = False)
     tof = False
     if not len(hrefs) == 0:
@@ -80,7 +80,7 @@ def exist_href(soup, anchor_class, ui = True):
     return tof
 
 # URL の画像を表示する
-def show_image(url : str, title : str, scaling = 1, ui = True):
+def show_image(url : str, title : str, scaling = 1, ui = False):
     try:
         time.sleep(1)
         with requests.get(url, stream = True).raw as resp:
@@ -99,7 +99,7 @@ def show_image(url : str, title : str, scaling = 1, ui = True):
         show_image(url, title, ui)
 
 # <a class="anchor_class"> <img src="***"> </a> の *** の部分をリスト化して取り出す
-def get_image_urls(soup, anchor_class, ui = True):
+def get_image_urls(soup, anchor_class, ui = False):
     anchors = soup.find_all(class_ = anchor_class)
     hrefs = []
     for anchor in anchors:
@@ -110,7 +110,7 @@ def get_image_urls(soup, anchor_class, ui = True):
     return hrefs
 
 # ファイルの種類によらず保存する
-def file_download(url, filename, ui = True):
+def file_download(url, filename, ui = False):
     roop = True
     # ヘッダ偽造
     headers = {"User-Agent" : "Mozilla/5.0 (Windows NT 10.0; Win64; x64) Apple WebKit/537.36 (KHTML, like Gecko) Chrome/78.9.3904.97 Safari/537.36"}
