@@ -57,9 +57,9 @@ def get_hrefs(soup, anchor_class, ui = False):
     return hrefs
 
 # <tag class = tag_class><a href = "***"></a></tag>
-def get_hrefs_from_tag_in_anchor(soup, tag_class, tag = "div", ui = False):
+def get_hrefs_from_tag_in_anchor(soup, class_, tag = "div", ui = False):
     # tag_class を持つ tag のリストを取得する
-    lists = get_tags_from_class(soup, class_ = tag_class, tag = tag, ui = ui)
+    lists = get_tags_from_class(soup, class_ = class_, tag = tag, ui = ui)
     if ui:
         print("[get] ", lists)
     return lists
