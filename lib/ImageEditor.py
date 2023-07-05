@@ -6,6 +6,7 @@
 import cv2
 import shutil
 import copy
+import PathEditor as pe
 
 # 画像をコンバートする
 def convertor(src_path, build_path, ui = False):
