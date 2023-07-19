@@ -15,27 +15,16 @@
 # 使い方
 1. 任意の場所にこのリポジトリをクローン
     ```
-    cd ~/lib
     git clone https://github.com/yazawakenichi/site_analizer
     ```
-    説明の都合上ここでは `~/lib` とする
-2. `site_analizer/lib` を PTH ファイルに追加する
-    1. PTH ファイルの場所を確認する
-        ```
-        python3
-        >>> import site
-        >>> site.getsitepackages()
-        ['/usr/local/lib/python3.8/site-packages']
-        ```
-        説明の都合上ここでは PTH ファイルの場所を `/usr/local/lib/python3.8/site-packages` とする
-    2. ファイルを追加し、追加したいパスを記述する
-        ```
-        vim /usr/local/lib/python3.8/site-packages/site_analizer.pth
-        ```
-        `site_analizer.pth`
-        ```
-        /home/user/lib/site_analizer/lib
-        ```
+
+2. site_analizer を Python ライブラリとして使用できるようにする
+    ``` bash
+    cd ./site_analizer
+    sudo ./setup
+    # Installed
+    ```
+
 3. Python スクリプト上で import する
     ```
     import FDEditor
