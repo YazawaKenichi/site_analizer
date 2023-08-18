@@ -39,7 +39,7 @@ def convert_indir(download_dir, ext = ".png", ui = True):
         convertor(src, build, ui = ui)
 
 # ディレクトリ作成
-def mkdir(dirname, ui = True):
+def mkdir(dirname, ui = False):
     if not os.path.exists(dirname):
         try:
             os.makedirs(dirname)

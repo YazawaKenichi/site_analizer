@@ -60,9 +60,13 @@ def get_hrefs(soup, anchor_class, ui = False):
 def get_hrefs_from_tag_in_anchor(soup, class_, tag = "div", ui = False):
     # tag_class を持つ tag のリストを取得する
     lists = get_tags_from_class(soup, class_ = class_, tag = tag, ui = ui)
+    hrefs = []
+    for li in lists:
+        anchor = li.find("a")
+        hrefs.append(str(anchor['href']))
     if ui:
         print("[get] ", lists)
-    return lists
+    return hrefs
 
 # bs4.BeautifulSoup 型にして返す
 def elementTag2BeautifulSoup(data, ui = False):
