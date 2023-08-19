@@ -12,6 +12,8 @@ import requests
 import sys
 import cv2
 import tempfile
+from PIL import Image
+import io
 
 # アドレスの BeautifulSoup を返す
 def get_soup(address, ui = False):
@@ -101,6 +103,10 @@ def show_image(url : str, title : str, scaling = 1, ui = False):
         time.sleep(0.5)
         # 取得できなかったときは再帰
         show_image(url, title, ui)
+
+# 画像のイメージを PIL.Image で取得
+def download_image_for_pil(url, ui = False):
+    return Image.open(io.BytesIO(requests.get(url).content))
 
 # <a class="anchor_class"> <img src="***"> </a> の *** の部分をリスト化して取り出す
 def get_image_urls(soup, anchor_class, ui = False):
