@@ -17,7 +17,7 @@ def imgurllist2pdf(urls, path, ui = False):
     imglist_pil = []
     for url in urls:
         # PIL.Image 型の画像を URL から取得
-        pil_image = sm.download_image_for_pil(url, ui = False)
+        pil_image = sm.download_image_for_pil(url, ui = False).convert("RGB")
         # PIL.Image をリストに追加する
         imglist_pil.append(pil_image)
     imglist_pil[0].save(path, "PDF", quality = 100, save_all = True, append_images = imglist_pil[1:], optimize = True)
