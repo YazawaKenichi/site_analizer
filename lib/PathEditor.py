@@ -63,3 +63,9 @@ def ismovie(path, ui = True):
         print(msg)
     return ext in movieexies
 
+def str2path(string):
+    string = string.replace("\n", "")
+    string = string.replace("\r", "")
+    string = string.replace("\t", "")
+    return string
+

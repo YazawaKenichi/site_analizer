@@ -60,14 +60,17 @@ def showimage(filepath, window_name = "Lorem Ipsum", ui = False):
     cv2.destroyAllWindows()
 
 # 画像を CLI 表示 fxy には一文字の縦横比を渡す ( 幅 / 高 ) の値
-def showimagecli(binary, title = "", height = term_size.lines - 2, width = term_size.columns, fxy = 1 / 3, fullscreen = False, ui = False):
+def showimagecli(binary, title = "", height = 128, width = 128, fxy = 1 / 3, fullscreen = False, ui = False):
     fx = 1
     fy = fx * fxy
     binary_push = cv2.resize(binary, dsize = None, fx = fx, fy = fy)
-    # ターミナルの文字数
-    term_size = shutil.get_terminal_size()
     wc_inrow = width # 列数
-    wc_inline = height # 行数
+    wc_inline = height - 2 # 行数
+    if fullscreen:
+        # ターミナルの文字数
+        term_size = shutil.get_terminal_size()
+        wc_inrow = term_size # 列数
+        wc_inline = term_size - 2 # 行数
     small_bin = scale_box(binary_push, wc_inrow, wc_inline)
     if ui:
         binary_original = copy.deepcopy(binary)

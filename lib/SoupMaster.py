@@ -8,11 +8,13 @@ import urllib
 from urllib import request
 import chardet
 from bs4 import BeautifulSoup
+import bs4
 import requests
 import sys
 import cv2
 import tempfile
-from PIL import Image
+from PIL import Image, ImageFile
+import ImageEditor as ie
 import io
 
 # アドレスの BeautifulSoup を返す
@@ -38,6 +40,12 @@ def get_soup(address, ui = False):
         time.sleep(0.5)
         get_soup(address, ui)
 
+def print_element(elem):
+    if isinstance(elem, bs4.NavigableString):
+        print(type(elem), elem.string)
+    else:
+        print(type(elem), elem.name)
+
 # 特定クラス名を持つタグの要素を取得
 def get_tags_from_class(soup, class_, tag = "div", ui = False):
     lists = soup.find_all(tag, class_ = class_)
@@ -59,13 +67,15 @@ def get_hrefs(soup, anchor_class, ui = False):
     return hrefs
 
 # <tag class = tag_class><a href = "***"></a></tag>
-def get_hrefs_from_tag_in_anchor(soup, class_, tag = "div", ui = False):
+def get_hrefs_from_tag_in_anchor(soup, class_, tag = "div", recursion = True, ui = False):
     # tag_class を持つ tag のリストを取得する
     lists = get_tags_from_class(soup, class_ = class_, tag = tag, ui = ui)
     hrefs = []
     for li in lists:
-        anchor = li.find("a")
-        hrefs.append(str(anchor['href']))
+        anchors = []
+        anchors = li.find_all("a")
+        for anchor in anchors:
+            hrefs.append(str(anchor['href']))
     if ui:
         print("[get] ", lists)
     return hrefs
@@ -106,7 +116,20 @@ def show_image(url : str, title : str, scaling = 1, ui = False):
 
 # 画像のイメージを PIL.Image で取得
 def download_image_for_pil(url, ui = False):
-    return Image.open(io.BytesIO(requests.get(url).content))
+    # ua_str = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36"
+    ua_str = "Mozilla/5.0 (iPhone; CPU iPhone OS 14_5 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) CriOS/91.0.4472.80 Mobile/15E148 Safari/604.1"
+    headers = {
+        'User-Agent': ua_str,
+        'content-type': 'application/json'
+    }
+    # content が画像に鳴ってない可能性
+    content = requests.get(url, headers = headers).content
+    image_data = io.BytesIO(content)
+    try :
+        return Image.open(image_data)
+    except PIL.UnidentifiedImageError :
+        print("画像データが返されませんでした", file = sys.stderr)
+        return -1
 
 # <a class="anchor_class"> <img src="***"> </a> の *** の部分をリスト化して取り出す
 def get_image_urls(soup, anchor_class, ui = False):
