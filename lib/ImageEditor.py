@@ -90,12 +90,5 @@ def showimagecli(binary, title = "", height = 128, width = 128, fxy = 1 / 3, ful
             r = str(values[2])
             print(f"\x1b[48;2;{r};{g};{b}m \x1b[0m", end = "")
         print("\n", end = "")
-    # 画像の描画
-    """
-    for y in range(len(image)):
-        for x in range(len(image[0])):
-            print(image[y][x], end = "")
-        print("\n", end = "")
-    """
     return h, w
 

@@ -29,12 +29,12 @@ def get_ext(path, ui = False):
     return str(res)
 
 # 文字列から接頭辞を削除する
-def cut_prefix(string, prefix, ui = True):
+def cut_prefix(string, prefix, ui = False):
     res = string[len(prefix) :]
     return res
 
 # スラッシュをパイプに変えて長い文字列を短くする
-def path_short(path, namelength = NAMELENGTH, ui = True):
+def path_short(path, namelength = NAMELENGTH, ui = False):
     ext = get_ext(path, ui = False)
     # スラッシュをパイプに置き換える
     path_opt = path.replace("/", "|")
@@ -46,7 +46,7 @@ def path_short(path, namelength = NAMELENGTH, ui = True):
     return path_opt
 
 # 指定文字列が画像を示すかどうかを返す
-def isimage(path, ui = True):
+def isimage(path, ui = False):
     imageexies = [".jpg", ".jpeg", ".png", ".ping", ".webp", ".jfif", ".svg", ".pgm", ".jpg_large"]
     ext = get_ext(path, ui = False)
     if ui:
@@ -55,7 +55,7 @@ def isimage(path, ui = True):
     return ext in imageexies
 
 # 指定文字列が動画を示すかどうかを返す
-def ismovie(path, ui = True):
+def ismovie(path, ui = False):
     movieexies = [".mov", ".mp4", ".avi", ".webm"]
     ext = get_ext(path, ui = False)
     if ui:

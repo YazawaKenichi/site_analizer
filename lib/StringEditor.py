@@ -3,7 +3,7 @@
 
 import re
 
-def str2list(string, splitchar = " ", ui = True):
+def str2list(string, splitchar = " ", ui = False):
     list_ = string.split(splitchar)
     return list_
 

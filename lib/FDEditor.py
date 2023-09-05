@@ -27,7 +27,7 @@ def file2list(filename, additional = []):
     return r_lines
 
 # ディレクトリ内の画像ファイルをコンバートする
-def convert_indir(download_dir, ext = ".png", ui = True):
+def convert_indir(download_dir, ext = ".png", ui = False):
     # download_dir 内のファイル名のリストを取得
     image_names = os.listdir(download_dir)
     image_names.sort()
@@ -52,12 +52,12 @@ def mkdir(dirname, ui = False):
             print("[mkdir] " + dirname + " is already exists.")
 
 # ファイルの中身をまっさらにする
-def file_clear(filepath, ui = True):
+def file_clear(filepath, ui = False):
     with open(filepath, mode="w") as f:
         f.truncate(0)
 
 # 空のファイルを作成する
-def touch(filepath, ui = True):
+def touch(filepath, ui = False):
     if not os.path.exists(filepath):
         with open(filepath, mode = "w") as f:
             f.truncate(0)
@@ -72,7 +72,7 @@ def get_listdir(dir_path):
     return ld
 
 # ファイルに文字列を保存
-def create_file(filepath, text, ui = True):
+def create_file(filepath, text, ui = False):
     with open(filepath, "w") as f:
         f.write(str(text))
         if ui:
@@ -80,7 +80,7 @@ def create_file(filepath, text, ui = True):
             print(" >>> \r\n" + text, end = "\r\n <<< \r\n")
 
 # ファイルパスからファイル名（拡張子あり）を取得する
-def path2name(filepath, ui = True):
+def path2name(filepath, ui = False):
     filename = os.path.basename(filepath)
     return filename
 
