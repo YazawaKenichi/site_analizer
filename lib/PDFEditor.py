@@ -9,6 +9,7 @@ import cv2
 import shutil
 import sys
 import SoupMaster as sm
+import time
 
 def dir2pdf(src_dir, pdf_path):
     with open(pdf_path, "wb") as f:
@@ -16,13 +17,22 @@ def dir2pdf(src_dir, pdf_path):
 
 # 画像の URL リストを PDF ファイルに変換
 def imgurllist2pdf(urls, path, ui = False):
+    ret = 0
     imglist_pil = []
     for url in urls:
         if ui :
             print(f"Img URL : {url}")
         # PIL.Image 型の画像を URL から取得
-        pil_image = sm.download_image_for_pil(url, ui = False).convert("RGB")
-        # PIL.Image をリストに追加する
-        imglist_pil.append(pil_image)
-    imglist_pil[0].save(path, "PDF", quality = 100, save_all = True, append_images = imglist_pil[1:], optimize = True)
+        pil_image_raw = sm.download_image_for_pil(url, ui = ui)
+        if not pil_image_raw == -1:
+            pil_image = pil_image_raw.convert("RGB")
+            # PIL.Image をリストに追加する
+            imglist_pil.append(pil_image)
+        time.sleep(0.5)
+    if len(imglist_pil) > 0:
+        imglist_pil[0].save(path, "PDF", quality = 100, save_all = True, append_images = imglist_pil[1:], optimize = True)
+        ret = 0
+    else:
+        ret = -1
+    return ret
 

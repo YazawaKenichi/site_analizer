@@ -79,6 +79,14 @@ def create_file(filepath, text, ui = False):
             print("[write] " + filepath)
             print(" >>> \r\n" + text, end = "\r\n <<< \r\n")
 
+# ファイル末行に文字列を追加
+def add_file_end(path, text, ui = False):
+    with open(path, "a") as f:
+        f.write(f"{text}\n")
+        if ui:
+            print("[write] " + path)
+            print(" >>> \r\n" + text, end = "\r\n <<< \r\n")
+
 # ファイルパスからファイル名（拡張子あり）を取得する
 def path2name(filepath, ui = False):
     filename = os.path.basename(filepath)

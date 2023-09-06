@@ -13,7 +13,7 @@ import requests
 import sys
 import cv2
 import tempfile
-from PIL import Image, ImageFile
+from PIL import Image, ImageFile, UnidentifiedImageError
 import ImageEditor as ie
 import io
 
@@ -122,13 +122,20 @@ def download_image_for_pil(url, ui = False):
         'User-Agent': ua_str,
         'content-type': 'application/json'
     }
-    # content が画像に鳴ってない可能性
-    content = requests.get(url, headers = headers).content
+    try :
+        content = requests.get(url, headers = headers).content
+    except requests.exceptions.MissingSchema as e:
+        if ui:
+            print(f"リクエストが返されませんでした : {e} {url}")
+            print(f"リクエストが返されませんでした : {e} {url}", file = sys.stderr)
+        return -1
     image_data = io.BytesIO(content)
     try :
         return Image.open(image_data)
-    except PIL.UnidentifiedImageError :
-        print("画像データが返されませんでした", file = sys.stderr)
+    except UnidentifiedImageError as e:
+        if ui:
+            print(f"画像の取得に失敗しました {e} {url}")
+            print(f"画像の取得に失敗しました {e} {url}", file = sys.stderr)
         return -1
 
 # <a class="anchor_class"> <img src="***"> </a> の *** の部分をリスト化して取り出す
