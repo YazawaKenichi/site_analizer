@@ -169,6 +169,8 @@ def file_download(url, filename, ui = False):
             if chunk:
                 f.write(chunk)
                 f.flush()
+    if ui:
+        print(f"[Write] {url} -> {filename}")
 
 # 特定のタグ内の要素を取り出す
 def get_elements(soup, tag):
