@@ -156,8 +156,6 @@ def file_download(url, filename, ui = False):
     headers = {"User-Agent" : "Mozilla/5.0 (Windows NT 10.0; Win64; x64) Apple WebKit/537.36 (KHTML, like Gecko) Chrome/78.9.3904.97 Safari/537.36"}
     while roop:
         try:
-            if ui :
-                print("[sleep] 5 sec ...")
             time.sleep(5)
             r = requests.get(url, stream = True, headers = headers)
             roop = False
