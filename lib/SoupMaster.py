@@ -124,6 +124,7 @@ def download_image_for_pil(url, sec = 1, ui = False):
     }
     try :
         content = requests.get(url, headers = headers).content
+        time.sleep(sec)
     except requests.exceptions.MissingSchema as e:
         if ui:
             print(f"リクエストが返されませんでした : {e} {url}")
@@ -137,7 +138,6 @@ def download_image_for_pil(url, sec = 1, ui = False):
             print(f"画像の取得に失敗しました {e} {url}")
             print(f"画像の取得に失敗しました {e} {url}", file = sys.stderr)
         return -1
-    time.sleep(sec)
 
 # <a class="anchor_class"> <img src="***"> </a> の *** の部分をリスト化して取り出す
 def get_image_urls(soup, anchor_class, ui = False):

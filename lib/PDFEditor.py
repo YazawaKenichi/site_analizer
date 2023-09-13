@@ -28,7 +28,6 @@ def imgurllist2pdf(urls, path, sec = 1, ui = False):
             pil_image = pil_image_raw.convert("RGB")
             # PIL.Image をリストに追加する
             imglist_pil.append(pil_image)
-        time.sleep(0.5)
     if len(imglist_pil) > 0:
         imglist_pil[0].save(path, "PDF", quality = 100, save_all = True, append_images = imglist_pil[1:], optimize = True)
         ret = 0
