@@ -16,14 +16,14 @@ def dir2pdf(src_dir, pdf_path):
         f.write(img2pdf.convert([Image.open(src_dir + j).filename for j in os.listdir(src_dir) if j.endswith(ext)]))
 
 # 画像の URL リストを PDF ファイルに変換
-def imgurllist2pdf(urls, path, ui = False):
+def imgurllist2pdf(urls, path, sec = 1, ui = False):
     ret = 0
     imglist_pil = []
     for url in urls:
         if ui :
             print(f"Img URL : {url}")
         # PIL.Image 型の画像を URL から取得
-        pil_image_raw = sm.download_image_for_pil(url, ui = ui)
+        pil_image_raw = sm.download_image_for_pil(url, sec = sec, ui = ui)
         if not pil_image_raw == -1:
             pil_image = pil_image_raw.convert("RGB")
             # PIL.Image をリストに追加する

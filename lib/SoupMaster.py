@@ -115,7 +115,7 @@ def show_image(url : str, title : str, scaling = 1, ui = False):
         show_image(url, title, ui)
 
 # 画像のイメージを PIL.Image で取得
-def download_image_for_pil(url, ui = False):
+def download_image_for_pil(url, sec = 1, ui = False):
     # ua_str = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36"
     ua_str = "Mozilla/5.0 (iPhone; CPU iPhone OS 14_5 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) CriOS/91.0.4472.80 Mobile/15E148 Safari/604.1"
     headers = {
@@ -137,6 +137,7 @@ def download_image_for_pil(url, ui = False):
             print(f"画像の取得に失敗しました {e} {url}")
             print(f"画像の取得に失敗しました {e} {url}", file = sys.stderr)
         return -1
+    time.sleep(sec)
 
 # <a class="anchor_class"> <img src="***"> </a> の *** の部分をリスト化して取り出す
 def get_image_urls(soup, anchor_class, ui = False):
