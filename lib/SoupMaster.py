@@ -3,6 +3,7 @@
 # SoupMaster.py
 # HTML を操作
 
+import datetime
 import time
 import urllib
 from urllib import request
@@ -15,6 +16,7 @@ import cv2
 import tempfile
 from PIL import Image, ImageFile, UnidentifiedImageError
 import ImageEditor as ie
+import FDEditor as fde
 import io
 
 # アドレスの BeautifulSoup を返す
@@ -80,6 +82,11 @@ def get_hrefs_from_tag_in_anchor(soup, class_, tag = "div", recursion = True, ui
         print("[get] ", lists)
     return hrefs
 
+# <tag class = tag_class> **** </tag>
+def get_text_from_tag(soup, class_, tag = "div", ui = False):
+    element = soup.find(tag, class_ = class_)
+    return element.text
+
 # bs4.BeautifulSoup 型にして返す
 def elementTag2BeautifulSoup(data, ui = False):
     string = ""
@@ -123,21 +130,43 @@ def download_image_for_pil(url, sec = 1, ui = False):
         'content-type': 'application/json'
     }
     try :
-        content = requests.get(url, headers = headers).content
+        response = requests.get(url, headers = headers)
+        # HTTP ステータスコードの確認
+        response.raise_for_status()
+        if ui:
+            print(f"Status Code : {response.status_code}")
+        content = response.content
         time.sleep(sec)
     except requests.exceptions.MissingSchema as e:
         if ui:
-            print(f"リクエストが返されませんでした : {e} {url}")
-            print(f"リクエストが返されませんでした : {e} {url}", file = sys.stderr)
-        return -1
+            print("\x1b[31m")
+            print(f"リクエストが返されませんでした > Error Code({e}) > URL({url})")
+            print(f"リクエストが返されませんでした > Error Code({e}) > URL({url})", file = sys.stderr)
+            print("\x1b[0m")
+        return 408, None
+    except requests.exceptions.RequestException as e:
+        if ui:
+            print("\x1b[31m")
+            print(f"リクエストが返されませんでした > Error Code({e}) > URL({url})")
+            print(f"リクエストが返されませんでした > Error Code({e}) > URL({url})", file = sys.stderr)
+            print("\x1b[0m")
+        return 408, None
     image_data = io.BytesIO(content)
     try :
-        return Image.open(image_data)
+        with Image.open(image_data) as im:
+            now = datetime.datetime.now()
+            tmp_path = f"__{now.year: >4}{now.month:0>2}{now.day:0>2}{now.hour:0>2}{now.minute:0>2}{now.second:0>2}.png"
+            # im.save(tmp_path, "PNG")
+            # fde.rm(tmp_path, "f", ui = ui)
+            im = Image.open(image_data)
+            return 0, im
     except UnidentifiedImageError as e:
         if ui:
-            print(f"画像の取得に失敗しました {e} {url}")
-            print(f"画像の取得に失敗しました {e} {url}", file = sys.stderr)
-        return -1
+            print("\x1b[31m")
+            print(f"画像の取得に失敗 > Error Code({e}) > URL({url})")
+            print(f"画像の取得に失敗 > Error Code({e}) > URL({url})", file = sys.stderr)
+            print("\x1b[0m")
+        return -1, None
 
 # <a class="anchor_class"> <img src="***"> </a> の *** の部分をリスト化して取り出す
 def get_image_urls(soup, anchor_class, ui = False):

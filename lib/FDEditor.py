@@ -108,3 +108,19 @@ def delinefromfile(path, string):
                 if not string in line.strip("\n"):
                     output.write(line)
     os.rename(tmp_path, path)
+
+# ファイルの削除
+def rm(path, opt, ui = False):
+    yes = "n"
+    ret = 0
+    if not ("f" in opt):
+        yes = input(f"削除しますか？ (yes / no)")
+    if ("f" in opt) or (yes.lower()[0] == "y"):
+        if ui:
+            print(f"削除 : {path}")
+        os.remove(path)
+        ret = 0
+    else:
+        ret = 1
+    return ret
+

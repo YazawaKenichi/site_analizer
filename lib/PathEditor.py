@@ -52,7 +52,7 @@ def isimage(path, ui = False):
     if ui:
         msg = f"[compare] path : {path} | ext : {ext} | {ext in imageexies}"
         print(msg)
-    return ext in imageexies
+    return ext.lower() in imageexies
 
 # 指定文字列が動画を示すかどうかを返す
 def ismovie(path, ui = False):
