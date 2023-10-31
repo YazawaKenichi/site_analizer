@@ -140,15 +140,15 @@ def download_image_for_pil(url, sec = 1, ui = False):
     except requests.exceptions.MissingSchema as e:
         if ui:
             print("\x1b[31m")
-            print(f"リクエストが返されませんでした > Error Code({e}) > URL({url})")
-            print(f"リクエストが返されませんでした > Error Code({e}) > URL({url})", file = sys.stderr)
+            print(f"[SoupMaster] リクエストが返されませんでした > Error Code({e}) > URL({url})")
+            print(f"[SoupMaster] リクエストが返されませんでした > Error Code({e}) > URL({url})", file = sys.stderr)
             print("\x1b[0m")
         return 408, None
     except requests.exceptions.RequestException as e:
         if ui:
             print("\x1b[31m")
-            print(f"リクエストが返されませんでした > Error Code({e}) > URL({url})")
-            print(f"リクエストが返されませんでした > Error Code({e}) > URL({url})", file = sys.stderr)
+            print(f"[SoupMaster] リクエストが返されませんでした > Error Code({e}) > URL({url})")
+            print(f"[SoupMaster] リクエストが返されませんでした > Error Code({e}) > URL({url})", file = sys.stderr)
             print("\x1b[0m")
         return 408, None
     image_data = io.BytesIO(content)
@@ -163,8 +163,8 @@ def download_image_for_pil(url, sec = 1, ui = False):
     except UnidentifiedImageError as e:
         if ui:
             print("\x1b[31m")
-            print(f"画像の取得に失敗 > Error Code({e}) > URL({url})")
-            print(f"画像の取得に失敗 > Error Code({e}) > URL({url})", file = sys.stderr)
+            print(f"[SoupMaster] 画像の取得に失敗 > Error Code({e}) > URL({url})")
+            print(f"[SoupMaster] 画像の取得に失敗 > Error Code({e}) > URL({url})", file = sys.stderr)
             print("\x1b[0m")
         return -1, None
 
@@ -178,6 +178,18 @@ def get_image_urls(soup, anchor_class, ui = False):
         if ui:
             print("[append] " + str(img['src']))
     return hrefs
+
+# <tag class="CLASS"><a href="HREF"><img src="***"></a><a href="HREF"><img src="***"></a></div>
+def get_image_urls_in_anchor_in_tag(soup, class_, tag = "div"):
+    __srcs = []
+    __tags = soup.find_all(tag, class_ = class_)
+    for __tag in __tags:
+        __anchors = __tag.find_all("a")
+        for __anchor in __anchors:
+            __imgs = __anchor.find_all("img")
+            for __img in __imgs:
+                __srcs.append(str(__img["src"]))
+    return __srcs
 
 # ファイルの種類によらず保存する
 def file_download(url, filename, ui = False):
