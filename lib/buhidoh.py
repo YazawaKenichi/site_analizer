@@ -64,6 +64,6 @@ class Buhidoh:
         tag = "div"
         for __src in sm.get_hrefs_from_tag_in_anchor(self.soup, class_, tag = tag):
             if pe.isimage(__src):
-                _src.append(__src)
+                _src.append(__src.replace("\n", "")
         self.src = _src[1:]
     
