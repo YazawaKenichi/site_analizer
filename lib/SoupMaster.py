@@ -236,3 +236,12 @@ def urlread(url):
         img = cv2.imread(fp.name)
     return img
 
+# <tag class="CLASS"><ul><li>***</li><li>***</li></ul></div>
+def get_list_html_to_python(soup, class_, tag = "div"):
+    list_html = []
+    div = soup.find(tag, class_ = class_)
+    element_list_htmls = div.find_all("li")
+    for element_list_html in element_list_htmls:
+        list_html.append(element_list_html.text)
+    return list_html
+
