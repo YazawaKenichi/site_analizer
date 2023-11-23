@@ -17,6 +17,8 @@ class URL:
         self.update_path()
         self.update_param()
         self.update_flag()
+        self.update_basename()
+        self.update_domain()
 
     def update_address(self, url):
         self.address = url
@@ -47,6 +49,12 @@ class URL:
         if "#" in self.address:
             _flag = self.address.split("#")[-1]
         self.flag = _flag
+
+    def update_basename(self):
+        self.basename = f"{self.scheme}://{self.fqdn}/{self.path}"
+
+    def update_domain(self):
+        self.domain = f"{self.scheme}://{self.fqdn}"
 
     def debug(self):
         print(f"Address : {self.address}\n\tScheme : {self.scheme}\n\t FQDN  : {self.fqdn}\n\t path  : {self.path}\n\tparam  : {self.param}\n\t flag  : {self.flag}")
