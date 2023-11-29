@@ -156,7 +156,7 @@ class Kemono:
             printer.print(f"[Kemono] Address : {self.url.address}")
             printer.print(f"[Kemono] ID : {self.id}, Service : {self.service}, Artist : {self.artist}")
             printer.print(f"[Kemono] Pages : {len(self.pages)}")
-    
+
     """ Get Bestchai Page """
     def get(self, url):
         self.posts = []

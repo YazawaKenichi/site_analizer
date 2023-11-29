@@ -48,6 +48,10 @@ def print_element(elem):
     else:
         print(type(elem), elem.name)
 
+def get_tags(soup, tag = "div"):
+    list_ = soup.find_all(tag)
+    return list_
+
 # 特定クラス名を持つタグの要素を取得
 def get_tags_from_class(soup, class_, tag = "div", ui = False):
     lists = soup.find_all(tag, class_ = class_)
@@ -170,7 +174,7 @@ def download_image_for_pil(url, sec = 1, ui = False):
 
 # <a class="anchor_class"> <img src="***"> </a> の *** の部分をリスト化して取り出す
 def get_image_urls(soup, anchor_class, ui = False):
-    anchors = soup.find_all(class_ = anchor_class)
+    anchors = soup.find_all("a", class_ = anchor_class)
     hrefs = []
     for anchor in anchors:
         img = anchor.find('img')
@@ -190,6 +194,19 @@ def get_image_urls_in_anchor_in_tag(soup, class_, tag = "div"):
             for __img in __imgs:
                 __srcs.append(str(__img["src"]))
     return __srcs
+
+# <tag class="CLASS"><a href="HREF"><img src="***"></a><a href="HREF"><img src="***"></a></div>
+def get_image_urls_in_anchor_in_tag_id(soup, id_, tag = "div"):
+    __srcs = []
+    __tags = soup.find_all(tag, id = id_)
+    for __tag in __tags:
+        __anchors = __tag.find_all("a")
+        for __anchor in __anchors:
+            __imgs = __anchor.find_all("img")
+            for __img in __imgs:
+                __srcs.append(str(__img["src"]))
+    return __srcs
+
 
 # ファイルの種類によらず保存する
 def file_download(url, filename, ui = False):
@@ -244,4 +261,14 @@ def get_list_html_to_python(soup, class_, tag = "div"):
     for element_list_html in element_list_htmls:
         list_html.append(element_list_html.text)
     return list_html
+
+# <tag class = "CLASS"><table><tr><th> KEY </th><td> VAL </td></tr></tag>
+def get_dict_html_to_python(soup, class_, tag = "div"):
+    dict_html = {}
+    div = soup.find(tag, class_ = class_)
+    trs = div.find_all("tr")
+    for tr in trs:
+        th = tr.find("th").text
+        td = tr.find("td").text
+        dict_html[th] = td
 
