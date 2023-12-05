@@ -190,6 +190,7 @@ class Kemono:
             address = kemonopage.next
             if address is None:
                 exist_next = False
+        self.pages.reverse()
 
     def update_posts(self):
         post_urls = []
