@@ -183,6 +183,16 @@ def get_image_urls(soup, anchor_class, ui = False):
             print("[append] " + str(img['src']))
     return hrefs
 
+# <tag class="CLASS" id="ID"><img src="***"><img src="***"> ... </tag>
+def get_image_urls_in_tag(soup, tag, class_ = None, id_ = None):
+    tags = soup.find_all(tag, class_ = class_, id = id_)
+    hrefs = []
+    for tag in tags:
+        imgs = tag.find_all("img")
+        for img in imgs:
+            hrefs.append(str(img["src"]))
+    return hrefs
+
 # <tag class="CLASS"><a href="HREF"><img src="***"></a><a href="HREF"><img src="***"></a></div>
 def get_image_urls_in_anchor_in_tag(soup, class_, tag = "div"):
     __srcs = []
