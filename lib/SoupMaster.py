@@ -264,9 +264,9 @@ def urlread(url):
     return img
 
 # <tag class="CLASS"><ul><li>***</li><li>***</li></ul></div>
-def get_list_html_to_python(soup, class_, tag = "div"):
+def get_list_html_to_python(soup, class_ = None, id = None, tag = "div"):
     list_html = []
-    div = soup.find(tag, class_ = class_)
+    div = soup.find(tag, class_ = class_, id = id)
     element_list_htmls = div.find_all("li")
     for element_list_html in element_list_htmls:
         list_html.append(element_list_html.text)
@@ -281,4 +281,14 @@ def get_dict_html_to_python(soup, class_, tag = "div"):
         th = tr.find("th").text
         td = tr.find("td").text
         dict_html[th] = td
+
+# <TAG1 class = "CLASS" id = "ID"><TAG2 KEY = "VAL"> ... </TAG1>
+def get_values_in_tag(soup, tag1, tag2, key, class_ = None, id = None):
+    val = []
+    tag1s = soup.find_all(tag1, class_ = class_, id = id)
+    for tag1 in tag1s:
+        tag2s = tag1.find_all(tag2)
+        for tag2 in tag2s:
+            val.append(tag2[key])
+    return val
 
