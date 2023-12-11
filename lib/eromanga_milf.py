@@ -4,6 +4,7 @@
 
 import SoupMaster as sm
 import PathEditor as pe
+import StdLib as sl
 import sys
 from PrintMaster import Printer
 
@@ -14,6 +15,7 @@ class EromangaMilf:
         self.ui = ui
         self.tags = []
         self.src = []
+        self.rensaku = []
         self.get(url)
         if self.ui:
             printer = Printer()
@@ -28,6 +30,7 @@ class EromangaMilf:
     def get(self, url):
         self.update_url(url)
         self.update_soup()
+        self.update_rensaku()
         self.update_title()
         self.update_category()
         self.update_tags()
@@ -38,6 +41,15 @@ class EromangaMilf:
         self.url = _url
     def update_soup(self):
         self.soup = sm.get_soup(self.url, ui  = False)
+
+    def update_rensaku(self):
+        div = self.soup.find("div", class_ = "box_rensaku")
+        if not div is None:
+            anchors = div.find_all("a")
+            for anchor in anchors:
+                self.rensaku.append(anchor["href"])
+        else:
+            self.rensaku = [self.url]
 
     def update_title(self):
         tag = "h1"
@@ -65,4 +77,40 @@ class EromangaMilf:
         for __src in _srcs:
             if pe.isimage(__src):
                 self.src.append(__src)
+
+class EromangaMilfs:
+    """ EromangaMilf class """
+
+    def __init__(self, url, ui = False):
+        self.ui = ui
+        self.src = []
+        self.milfs = []
+        self.get(url)
+        self.title = "test"
+        if self.ui:
+            printer = Printer()
+            config = { "name" : "EromangaMilfs", "screen-full" : False}
+            printer.setConfig(config)
+            printer.print(f"Srcs : {self.src}")
+
+    """ Get EromangaMilf Page """
+    def get(self, url):
+        self.update_url(url)
+        self.update_soup()
+        self.update_milf()
+        self.update_src()
+
+    """ Update """
+    def update_url(self, _url):
+        self.url = _url
+    def update_soup(self):
+        self.soup = sm.get_soup(self.url, ui  = False)
+
+    def update_milf(self):
+        self.rensaku = EromangaMilf(self.url).rensaku
+        self.milfs = [EromangaMilf(_milf, ui = self.ui) for _milf in self.rensaku]
+
+    def update_src(self):
+        for milf in self.milfs:
+            self.src = sl.extend(self.src, milf.src)
 

@@ -25,10 +25,11 @@ class Printer:
     }
     """
 
-    def __init__(self):
+    def __init__(self, enable = True):
         self.prefix = ""
         self.len = 65536
         self.screen_full = False
+        self.enable = enable
 
     def setConfig(self, config):
         self.prefix = ""
@@ -53,14 +54,19 @@ class Printer:
             self.len = config["len"]
         if "screen-full" in config.keys():
             self.screen_full = config["screen-full"]
+        if "enable" in config.keys():
+            self.enable = config["enable"]
         self.prefix = f"{self.name_string}{self.sub_string}"
 
-    def print(self, string, end = "\r\n", file = sys.stdout):
+    def print(self, string, end = "\r\n", file = sys.stdout, enable = None):
         if self.screen_full:
             term_size = shutil.get_terminal_size()
             self.len = term_size.columns
         message = f"{self.prefix} {string}"[:self.len]
         width_count = get_east_asian_width_count(message)
         message = message[:self.len - width_count]
-        print(message, end = end, file = file)
+        if (not enable is None) and (enable != self.enable):
+            self.enable = enable
+        if self.enable:
+            print(message, end = end, file = file)
 
