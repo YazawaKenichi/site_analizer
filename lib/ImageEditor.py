@@ -6,7 +6,10 @@
 import cv2
 import shutil
 import copy
+import numpy as np
+from PIL import Image
 import PathEditor as pe
+import StdLib as sl
 
 # 画像をコンバートする
 def convertor(src_path, build_path, ui = False):
@@ -51,13 +54,17 @@ def writeimage(img, filename = "out.png", ui = False):
     cv2.imwrite(filename, img)
 
 # 画像を表示
-def showimage(filepath, window_name = "Lorem Ipsum", ui = False):
-    img = cv2.imread(filepath)
-    cv2.imshow(window_name, img)
+def imshow(im, window_name = "Lorem Ipsum", ui = False):
+    cv2.imshow(window_name, im)
     if ui:
         print("Press any key exit ...")
     cv2.waitKey(0)
     cv2.destroyAllWindows()
+
+# 画像を表示
+def showimage(filepath, window_name = "Lorem Ipsum", ui = False):
+    img = cv2.imread(filepath)
+    imshow(img, window_name, ui = ui)
 
 # 画像を CLI 表示 fxy には一文字の縦横比を渡す ( 幅 / 高 ) の値
 def showimagecli(binary, title = "", height = 128, width = 128, fxy = 1 / 3, fullscreen = False, ui = False):
@@ -91,4 +98,42 @@ def showimagecli(binary, title = "", height = 128, width = 128, fxy = 1 / 3, ful
             print(f"\x1b[48;2;{r};{g};{b}m \x1b[0m", end = "")
         print("\n", end = "")
     return h, w
+
+# PIL to CV2
+def pil2cv(image):
+    new_image = np.array(image, dtype = np.uint8)
+    if new_image.ndim == 2:
+        pass
+    elif new_image.shape[2] == 3:
+        new_image = cv2.cvtColor(new_image, cv2.COLOR_RGB2BGR)
+    elif new_image.shape[2] == 4:
+        new_image = cv2.cvtColor(new_image, cv2.COLOR_RGBA2BGRA)
+    return new_image
+
+# CV2 ot PIL
+def cv2pil(image):
+    new_image = image.copy()
+    if new_image.ndim == 2:  # モノクロ
+        pass
+    elif new_image.shape[2] == 3:  # カラー
+        new_image = cv2.cvtColor(new_image, cv2.COLOR_BGR2RGB)
+    elif new_image.shape[2] == 4:  # 透過
+        new_image = cv2.cvtColor(new_image, cv2.COLOR_BGRA2RGBA)
+    new_image = Image.fromarray(new_image)
+    return new_image
+
+# 画像をトリム ( image は cv2 mat 型 )
+def trim(image, p1, p2):
+    height, width, _ = image.shape[:3]
+    p1[0] = sl.limit(p1[0], 0, width)
+    p1[1] = sl.limit(p1[1], 0, height)
+    p2[0] = sl.limit(p2[0], 0, width)
+    p2[1] = sl.limit(p2[1], 0, height)
+    res = image[p1[1]:p2[1], p1[0]:p2[0]]
+    return res
+
+# PIL 画像を表示
+def pilimshow(img, window_name = "Lorem Ipsum"):
+    img.show()
+    input()
 
