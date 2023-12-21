@@ -18,6 +18,7 @@ from PIL import Image, ImageFile, UnidentifiedImageError
 import ImageEditor as ie
 import FDEditor as fde
 import io
+import os
 
 # アドレスの BeautifulSoup を返す
 def get_soup(address, ui = False):
@@ -41,6 +42,11 @@ def get_soup(address, ui = False):
             print("\x1b[31m" + address + " : Time Out!" + "\x1b[0m", file = sys.stderr)
         time.sleep(0.5)
         get_soup(address, ui)
+
+def list2soup(_list, ui = False):
+    li = "".join(map(str, _list))
+    soup = BeautifulSoup(li, "html.parser")
+    return soup
 
 def print_element(elem):
     if isinstance(elem, bs4.NavigableString):
@@ -231,6 +237,7 @@ def file_download(url, filename, ui = False):
         except TimeoutError:
             print("[TimeoutError] Retry ... ")
             roop = True
+    fde.mkdir(os.path.dirname(filename))
     with open(filename, 'wb') as f:
         for chunk in r.iter_content(chunk_size = 1024):
             if chunk:

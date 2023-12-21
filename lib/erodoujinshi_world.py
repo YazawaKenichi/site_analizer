@@ -13,7 +13,7 @@ class ErodoujinshiWorld:
     def __init__(self, url, ui = False):
         self.ui = ui
         self.tags = []
-        self.src = []
+        self.srcs = []
         self.get(url)
         if self.ui:
             printer = Printer()
@@ -22,7 +22,7 @@ class ErodoujinshiWorld:
             printer.print(f"Address : {self.url}")
             printer.print(f"Title : {self.title}")
             printer.print(f"Tags : {self.tags}")
-            printer.print(f"Srcs : {self.src}")
+            printer.print(f"Srcs : {self.srcs}")
 
     """ Get ErodoujinshiWorld Page """
     def get(self, url):
@@ -31,7 +31,8 @@ class ErodoujinshiWorld:
         self.update_title()
         self.update_category()
         self.update_tags()
-        self.update_src()
+        self.update_srcs()
+        self.update_sitename()
 
     """ Update """
     def update_url(self, _url):
@@ -59,12 +60,14 @@ class ErodoujinshiWorld:
         for anchor in anchors:
             self.tags.append(anchor.text)
 
-    def update_src(self):
+    def update_srcs(self):
         _src = []
         tag = "div"
         class_ = "kijibox"
         _srcs = sm.get_values_in_tag(self.soup, "div", "a", key = "href", class_ = "kijibox")
         for _src in _srcs:
             if pe.isimage(_src):
-                self.src.append(_src)
+                self.srcs.append(_src)
 
+    def update_sitename(self):
+        self.sitename = "エロ同人誌ワールド"

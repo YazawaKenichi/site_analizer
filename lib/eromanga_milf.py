@@ -14,7 +14,7 @@ class EromangaMilf:
     def __init__(self, url, ui = False):
         self.ui = ui
         self.tags = []
-        self.src = []
+        self.srcs = []
         self.rensaku = []
         self.get(url)
         if self.ui:
@@ -24,7 +24,7 @@ class EromangaMilf:
             printer.print(f"Address : {self.url}")
             printer.print(f"Title : {self.title}")
             printer.print(f"Tags : {self.tags}")
-            printer.print(f"Srcs : {self.src}")
+            printer.print(f"Srcs : {self.srcs}")
 
     """ Get EromangaMilf Page """
     def get(self, url):
@@ -34,7 +34,7 @@ class EromangaMilf:
         self.update_title()
         self.update_category()
         self.update_tags()
-        self.update_src()
+        self.update_srcs()
 
     """ Update """
     def update_url(self, _url):
@@ -69,36 +69,38 @@ class EromangaMilf:
         class_ = "article-tags"
         self.tags = sm.get_list_html_to_python(self.soup, class_ = class_, tag = tag)
 
-    def update_src(self):
+    def update_srcs(self):
         _src = []
         tag = "section"
         class_ = "entry-content"
         _srcs = sm.get_values_in_tag(self.soup, tag, "img", key = "src", class_ = class_)
         for __src in _srcs:
             if pe.isimage(__src):
-                self.src.append(__src)
+                self.srcs.append(__src)
 
 class EromangaMilfs:
     """ EromangaMilf class """
 
     def __init__(self, url, ui = False):
         self.ui = ui
-        self.src = []
+        self.srcs = []
         self.milfs = []
         self.get(url)
-        self.title = "test"
         if self.ui:
             printer = Printer()
             config = { "name" : "EromangaMilfs", "screen-full" : False}
             printer.setConfig(config)
-            printer.print(f"Srcs : {self.src}")
+            printer.print(f"Srcs : {self.srcs}")
 
     """ Get EromangaMilf Page """
     def get(self, url):
         self.update_url(url)
         self.update_soup()
         self.update_milf()
-        self.update_src()
+        self.update_title()
+        self.update_category()
+        self.update_srcs()
+        self.update_sitename()
 
     """ Update """
     def update_url(self, _url):
@@ -110,7 +112,15 @@ class EromangaMilfs:
         self.rensaku = EromangaMilf(self.url).rensaku
         self.milfs = [EromangaMilf(_milf, ui = self.ui) for _milf in self.rensaku]
 
-    def update_src(self):
-        for milf in self.milfs:
-            self.src = sl.extend(self.src, milf.src)
+    def update_title(self):
+        self.title = self.rensaku[0].split("/")[-1]
 
+    def update_category(self):
+        self.category = self.milfs[0].category
+
+    def update_srcs(self):
+        for milf in self.milfs:
+            self.srcs = sl.extend(self.srcs, milf.srcs)
+
+    def update_sitename(self):
+        self.sitename = "エロ漫画の艶"

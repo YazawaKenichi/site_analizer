@@ -19,7 +19,7 @@ class Mangalear:
         self.printer.setConfig(self.config)
 
         self.tags = []
-        self.src = []
+        self.srcs = []
 
         self.get(url)
 
@@ -31,7 +31,8 @@ class Mangalear:
             self.update_title()
             self.update_category()
             self.update_tags()
-            self.update_src()
+            self.update_srcs()
+            self.update_sitename()
 
     """ Update """
     def update_url(self, _url):
@@ -65,7 +66,7 @@ class Mangalear:
             self.tags.append(anchor.text)
         self.printer.print(f"Tags : {self.tags}")
 
-    def update_src(self):
+    def update_srcs(self):
         _src = []
         tag = "div"
         class_ = "entry-content"
@@ -73,8 +74,8 @@ class Mangalear:
         _srcs = sm.get_values_in_tag(self.soup, tag, "a", key = "href", class_ = class_, id = id)
         for __src in _srcs:
             if pe.isimage(__src):
-                self.src.append(__src)
-        self.printer.print(f"Srcs : {self.src}")
+                self.srcs.append(__src)
+        self.printer.print(f"Srcs : {self.srcs}")
 
     def isNotFound(self):
         text = ""
@@ -83,3 +84,5 @@ class Mangalear:
             text = h2.text
         return text
 
+    def update_sitename(self):
+        self.sitename = "同人まんがりあ"

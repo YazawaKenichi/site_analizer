@@ -3,9 +3,23 @@
 # URLMaster
 
 import re
+from urllib.parse import unquote
 
 class URL:
     """ URL Analizer """
+
+    """
+    _url = "https://www.example.com/dir1/dir2/file.ex?key1=val1&key2=val2&key3=val3#flag
+    url = URL(_url)
+    "https://www.example.com/dir1/dir2/file.ex?key1=val1&key2=val2&key3=val3#flag" = url.address
+    "https" = url.scheme
+    "www.example.com"= url.fqdn
+    "dir1/dir2/file.ex" = url.path
+    {"key1" : "val1", "key2" : "val2"} = url.param
+    "flag" = url.flag
+    "https://www.example.com/dir1/dir2/file.ex" = url.basename
+    "https://www.example.com" = url.domain
+    """
 
     def __init__(self, url):
         self.get(url)
@@ -21,7 +35,7 @@ class URL:
         self.update_domain()
 
     def update_address(self, url):
-        self.address = url
+        self.address = unquote(url)
 
     def update_scheme(self):
         self.scheme = self.address.split("://")[0]

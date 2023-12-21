@@ -1,29 +1,30 @@
 #!/usr/bin/env python3
 # coding : utf-8
-# Eromanga-Select
+# Krov23
 
 import SoupMaster as sm
 import PathEditor as pe
 import sys
 from PrintMaster import Printer
+from URLMaster import URL
 
-class Shikotch:
-    """ Shikotch class """
+class Krov23:
+    """ Krov23 Class """
 
     def __init__(self, url, ui = False):
         self.ui = ui
-        self.tags = []
+        self.printer = Printer()
+        config = { "name" : __class__.__name__, "screen-full" : False}
+        self.printer.setConfig(config)
         self.get(url)
         if self.ui:
-            printer = Printer()
-            config = { "name" : "Shikotch", "screen-full" : True}
-            printer.setConfig(config)
-            printer.print(f"Address : {self.url}")
-            printer.print(f"Title : {self.title}")
-            printer.print(f"Tags : {self.tags}")
-            printer.print(f"Srcs : {self.srcs}")
+            self.printer.print(f"Address : {self.url}")
+            self.printer.print(f"Title : {self.title}")
+            self.printer.print(f"Category : {self.category}")
+            self.printer.print(f"Tags : {self.tags}")
+            self.printer.print(f"Srcs : {self.srcs}")
 
-    """ Get Shikotch Page """
+    """ Get EromangaSelect Page """
     def get(self, url):
         self.update_url(url)
         self.update_soup()
@@ -40,22 +41,25 @@ class Shikotch:
         self.soup = sm.get_soup(self.url, ui  = False)
 
     def update_title(self):
-        tag = "h1"
+        tag = "h2"
         class_ = None
         div = self.soup.find(tag, class_ = class_)
         self.title = div.text
 
     def update_tags(self):
-        span = self.soup.find("span", id = "post-tag")
-        anchors = span.find_all("a")
-        for anchor in anchors:
-            self.tags.append(anchor.text)
+        section = self.soup.find("section")
+        trs = section.find_all("tr")
+        td = trs[1].find("td")
+        lis = td.find_all("li")
+        self.tags = [t.text for t in lis]
 
     def update_srcs(self):
         _src = []
         tag = "div"
-        id_ = "post-comic"
-        __srcs = sm.get_image_urls_in_tag(self.soup, tag, id_ = id_)
+        id_ = "content"
+        tags = sm.get_tags_from_id(self.soup, id_, tag = tag)
+        h3 = sm.get_tags(tags[0], "h3")[0]
+        __srcs = sm.get_image_urls(h3, None)
         for __src in __srcs:
             if pe.isimage(__src):
                 tmp = __src.replace("\n", "")
@@ -63,7 +67,7 @@ class Shikotch:
         self.srcs = _src
 
     def update_sitename(self):
-        self.sitename = "シコっち"
+        self.sitename = "エロ漫画セレクション"
 
     def update_category(self):
-        self.category = self.tags[0]
+        self.category = URL(self.url).path.split("/")[0]

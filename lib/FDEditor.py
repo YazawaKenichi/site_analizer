@@ -13,15 +13,17 @@ import os
 
 # ファイル名から一行ずつリストに格納
 def file2list(filename, additional = []):
-    with open(filename) as f:
-        lines = []
-        for line in f:
-            line = line.replace("\n", "")
-            line = line.replace(" ", "")
-            line = line.split("#")[0]
-            if not line == "":
-                lines.append(line)
-    r_lines = list(dict.fromkeys(lines))
+    r_lines = []
+    if os.path.exists(filename):
+        with open(filename) as f:
+            lines = []
+            for line in f:
+                line = line.replace("\n", "")
+                line = line.replace(" ", "")
+                line = line.split("#")[0]
+                if not line == "":
+                    lines.append(line)
+        r_lines = list(dict.fromkeys(lines))
     if not additional is None:
         r_lines = additional + r_lines
     return r_lines
@@ -137,4 +139,19 @@ def rm(path, opt, ui = False):
     else:
         ret = 1
     return ret
+
+# ファイル内に特定の文字列があるかどうか
+def check_string_in_file(path, string):
+    try:
+        with open(path, "r", encoding = "utf-8") as file:
+            content = file.read()
+            if string in content:
+                return True
+            else:
+                return False
+    except FileNotFoundError:
+        return False
+    except Exception as e:
+        return False
+
 

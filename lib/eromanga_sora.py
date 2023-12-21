@@ -4,6 +4,7 @@
 
 import SoupMaster as sm
 import PathEditor as pe
+import StdLib as sl
 import sys
 from PrintMaster import Printer
 
@@ -13,7 +14,8 @@ class EromangaSora:
     def __init__(self, url, ui = False):
         self.ui = ui
         self.tags = []
-        self.src = []
+        self.srcs = []
+        self.rensaku = []
         self.get(url)
         if self.ui:
             printer = Printer()
@@ -22,7 +24,7 @@ class EromangaSora:
             printer.print(f"Address : {self.url}")
             printer.print(f"Title : {self.title}")
             printer.print(f"Tags : {self.tags}")
-            printer.print(f"Srcs : {self.src}")
+            printer.print(f"Srcs : {self.srcs}")
 
     """ Get EromangaSora Page """
     def get(self, url):
@@ -31,7 +33,9 @@ class EromangaSora:
         self.update_title()
         self.update_category()
         self.update_tags()
-        self.update_src()
+        self.update_srcs()
+        self.update_rensaku()
+        self.update_sitename()
 
     """ Update """
     def update_url(self, _url):
@@ -57,13 +61,71 @@ class EromangaSora:
         class_ = "article-tags"
         self.tags = sm.get_list_html_to_python(self.soup, class_ = class_, tag = tag)
 
-    def update_src(self):
+    def update_srcs(self):
         _src = []
         tag = "section"
         class_ = "entry-content"
         _srcs = sm.get_values_in_tag(self.soup, tag, "img", key = "src", class_ = class_)
         for __src in _srcs:
             if pe.isimage(__src):
-                self.src.append(__src)
+                self.srcs.append(__src)
 
+    def update_sitename(self):
+        self.sitename = "エロ漫画の空"
+
+    def update_rensaku(self):
+        div = self.soup.find("div", class_ = "box_rensaku")
+        if not div is None:
+            anchors = div.find_all("a")
+            for anchor in anchors:
+                self.rensaku.append(anchor["href"])
+        else:
+            self.rensaku = [self.url]
+
+class EromangaSoras:
+    """ EromangaSoras class """
+
+    def __init__(self, url, ui = False):
+        self.ui = ui
+        self.srcs = []
+        self.soras = []
+        self.get(url)
+        if self.ui:
+            printer = Printer()
+            config = { "name" : "EromangaSoras", "screen-full" : False}
+            printer.setConfig(config)
+            printer.print(f"Srcs : {self.srcs}")
+
+    """ Get EromangaSora Page """
+    def get(self, url):
+        self.update_url(url)
+        self.update_soup()
+        self.update_sora()
+        self.update_title()
+        self.update_category()
+        self.update_srcs()
+        self.update_sitename()
+
+    """ Update """
+    def update_url(self, _url):
+        self.url = _url
+    def update_soup(self):
+        self.soup = sm.get_soup(self.url, ui  = False)
+
+    def update_sora(self):
+        self.rensaku = EromangaSora(self.url).rensaku
+        self.soras = [EromangaSora(_sora, ui = self.ui) for _sora in self.rensaku]
+
+    def update_title(self):
+        self.title = self.rensaku[0].split("/")[-1]
+
+    def update_category(self):
+        self.category = self.soras[0].category
+
+    def update_srcs(self):
+        for sora in self.soras:
+            self.srcs = sl.extend(self.srcs, sora.srcs)
+
+    def update_sitename(self):
+        self.sitename = "エロ漫画の空"
 
