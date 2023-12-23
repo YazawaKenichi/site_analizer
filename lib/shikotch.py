@@ -14,6 +14,7 @@ class Shikotch:
         self.ui = ui
         self.tags = []
         self.get(url)
+        self.notfound = False
         if self.ui:
             printer = Printer()
             config = { "name" : "Shikotch", "screen-full" : True}

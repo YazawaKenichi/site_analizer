@@ -160,36 +160,48 @@ class Manga2PDF:
         return r
     
     def generatePDF(self, path, srcs, address):
-        if not ((fde.check_string_in_file(self.log, address)) and self.skip):
-            pdfe.imgurllist2pdf(srcs, path)
+        error = False
+        if not (fde.check_string_in_file(self.log, address) and os.path.exists(path) and self.skip):
+            try:
+                pdfe.imgurllist2pdf(srcs, path)
+            except OSError:
+                error = True
+        return error
 
     def main(self):
         for address_index, address in enumerate(self.addresses):
+            errored = False
             if not "end" in address.lower():
                 self.printer.print("Next ...")
                 self.printer.print(f"[Address] {address}")
                 manga = self.discrimination(address, ui = self.detail)
                 if not manga is None:
-                    self.printer.print(f"[Title] {manga.title}")
-                    title = pe.path_short(manga.title)
-                    site = pe.path_short(manga.sitename)
-                    category = pe.path_short(manga.category)
-                    subdir = os.path.join(f"{self.download_dir}", f"{site}", f"{category}")
-                    fde.mkdir(subdir)
-                    path = os.path.join(f"{subdir}", f"{title}.pdf")
-                    self.generatePDF(path, manga.srcs, address)
-                    if self.ui:
-                        self.printer.print(f"[Address] {address}")
-                        self.printer.print(f"[  Path ] {path}")
-                    rensaku = []
-                    try:
-                        rensaku = manga.rensaku
-                    except:
-                        rensaku = [address]
-                    for add in rensaku:
-                        fde.add_file_end(self.log, add, duplicate = False)
+                    if not manga.notfound:
+                        self.printer.print(f"[Title] {manga.title}")
+                        title = pe.path_short(manga.title)
+                        site = pe.path_short(manga.sitename)
+                        category = pe.path_short(manga.category)
+                        subdir = os.path.join(f"{self.download_dir}", f"{site}", f"{category}")
+                        fde.mkdir(subdir)
+                        path = os.path.join(f"{subdir}", f"{title}.pdf")
+                        errored = self.generatePDF(path, manga.srcs, address)
+                        if not errored:
+                            if self.ui:
+                                self.printer.print(f"[Address] {address}")
+                                self.printer.print(f"[  Path ] {path}")
+                            rensaku = []
+                            try:
+                                rensaku = manga.rensaku
+                            except:
+                                rensaku = [address]
+                            for add in rensaku:
+                                fde.add_file_end(self.log, add, duplicate = False)
+                    else:
+                        self.printer.print("[Error] NotFound")
                 else:
                     self.printer.print("[Error] Undefined Site", file = sys.stderr)
+            if errored:
+                fde.add_file_end(self.skipped_url_file, address, duplicate = False)
             if self.delete:
                 fde.delinefromfile(self.listpath, address)
             if "end" in address.lower():

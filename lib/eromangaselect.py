@@ -17,6 +17,7 @@ class EromangaSelect:
         config = { "name" : "EromangaSelect", "screen-full" : True}
         self.printer.setConfig(config)
         self.get(url)
+        self.notfound = False
         if self.ui:
             self.printer.print(f"Address : {self.url}")
             self.printer.print(f"Title : {self.title}")

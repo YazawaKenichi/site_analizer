@@ -19,6 +19,7 @@ import ImageEditor as ie
 import FDEditor as fde
 import io
 import os
+import numpy as np
 
 # アドレスの BeautifulSoup を返す
 def get_soup(address, ui = False):

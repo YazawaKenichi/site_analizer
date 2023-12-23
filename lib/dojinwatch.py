@@ -10,10 +10,13 @@ class DojinWatch:
     def __init__(self, url, ui = False):
         self.update_url(url)
         self.update_soup()
+        self.update_descriptions()
+        self.update_title()
         self.update_tags()
-        self.update_artist_title_category()
+        self.update_category()
         self.update_srcs()
         self.update_sitename()
+        self.notfound = False
 
         if ui :
             printer = Printer()
@@ -35,7 +38,7 @@ class DojinWatch:
     def update_soup(self):
         self.soup = sm.get_soup(self.url)
 
-    def update_tags(self):
+    def update_descriptions(self):
         class_ = "kijibox"
         tag = "div"
         kijibox = sm.get_tags_from_class(self.soup, class_ = class_, tag = tag, ui = False)[0]
@@ -45,22 +48,35 @@ class DojinWatch:
         tags = {}
         lines = text.split("\n")
         for line in lines:
-            li = line.split("：")
-            key = li[0]
-            val = li[1]
-            tags[key] = val
-        self.tags = tags
+            if ":" in line:
+                li = line.split("：")
+                key = li[0]
+                val = li[1]
+                tags[key] = val
+        self.descriptions = tags
 
-    def update_artist_title_category(self):
-        if "作者名" in self.tags.keys():
-            self.artist = self.tags["作者名"]
-        elif "サークル名" in self.tags.keys():
-            self.artist = self.tags["サークル名"]
-        if "作品名" in self.tags.keys():
-            self.title = self.tags["作品名"]
+    def update_title(self):
+        self.title = ""
+        if "作品名" in self.descriptions.keys():
+            self.title = self.descriptions["作品名"]
         else:
-            self.title = URL(self.url).path.split(".")[-2]
-        self.category = self.tags["元ネタ"]
+            _url = URL(self.url)
+            self.title = _url.path.split("/")[-1]
+
+    def update_tags(self):
+        self.tags = []
+        tag = "li"
+        class_ = "post_tag"
+        li = self.soup.find(tag, class_)
+        anchors = li.find_all("a")
+        for anchor in anchors:
+            self.tags.append(anchor.text)
+
+    def update_category(self):
+        tag = "li"
+        class_ = "post_category"
+        li = self.soup.find(tag, class_ = class_)
+        self.category = li.text
 
     def update_srcs(self):
         hrefs = []
@@ -68,16 +84,22 @@ class DojinWatch:
         class_ = "kijibox"
         kijibox = self.soup.find(tag, class_ = class_)
         ps = kijibox.find_all("p")[1:]
-        for p in ps:
-            anchor = p.find("a")
-            if not anchor is None:
+        if not len(ps) == 0:
+            for p in ps:
+                anchors = p.find_all("a")
+                for anchor in anchors:
+                    if not anchor is None:
+                        hrefs.append(anchor["href"])
+                    else:
+                        img = p.find("img")
+                        key = "src"
+                        if not pe.isimage(img["src"]):
+                            key = "data-lazy-src"
+                        hrefs.append(img[key])
+        else:
+            anchors = kijibox.find_all("a")
+            for anchor in anchors:
                 hrefs.append(anchor["href"])
-            else:
-                img = p.find("img")
-                key = "src"
-                if not pe.isimage(img["src"]):
-                    key = "data-lazy-src"
-                hrefs.append(img[key])
         self.srcs = hrefs
 
     def update_sitename(self):

@@ -11,6 +11,7 @@ class NukiDokoro:
         self.update_url(url)
         self.update_soup()
         self.update_nopener()
+        self.notfound = False
         if not self.isNopener():
             self.update_tags()
             self.update_title()

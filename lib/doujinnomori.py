@@ -11,6 +11,7 @@ class Doujinnomori:
 
     def __init__(self, url):
         self.get(url)
+        self.notfound = False
 
     def get(self, url):
         self.update_url(url)

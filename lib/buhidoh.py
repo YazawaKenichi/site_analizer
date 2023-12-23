@@ -17,11 +17,15 @@ class Buhidoh:
     def get(self, url):
         self.update_url(url)
         self.update_soup()
-        self.update_title()
-        self.update_category()
-        self.update_description()
-        self.update_srcs()
-        self.update_sitename()
+        if not self.isNotFound():
+            self.notfound = False
+            self.update_title()
+            self.update_category()
+            self.update_description()
+            self.update_srcs()
+            self.update_sitename()
+        else:
+            self.notfound = True
 
     """ SoupMaster Edit """
     def __get_image_urls_in_anchor_href_image_in_tag(self, class_, tag = "div"):
@@ -35,6 +39,11 @@ class Buhidoh:
                     for __img in __imgs:
                         __srcs.append(str(__img["src"]))
         return __srcs
+
+    def isNotFound(self):
+        title = self.soup.find("title")
+        notfound = ("ページが見つかりませんでした" in title.text)
+        return notfound
 
     """ Update """
     def update_url(self, _url):

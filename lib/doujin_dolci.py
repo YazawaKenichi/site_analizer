@@ -15,6 +15,7 @@ class DoujinDolci:
         self.update_tags()
         self.update_srcs()
         self.update_sitename()
+        self.notfound = False
 
         if ui :
             printer = Printer()
@@ -52,7 +53,11 @@ class DoujinDolci:
         class_ = "par_cat"
         ul = self.soup.find(tag, class_ = class_)
         li = ul.find("li")
-        self.category = li.text
+        if not li is None:
+            self.category = li.text
+        else:
+            url = URL(self.url)
+            self.category = url.path.split("/")[0]
 
     def update_tags(self):
         tags = []

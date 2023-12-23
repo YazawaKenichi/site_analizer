@@ -12,6 +12,7 @@ class MoeeroLibrary:
         self.update_artist_title_category()
         self.update_srcs()
         self.update_sitename()
+        self.notfound = False
 
     def update_url(self, url):
         self.url = url

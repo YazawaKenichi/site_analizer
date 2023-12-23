@@ -15,6 +15,7 @@ class ErodoujinshiWorld:
         self.tags = []
         self.srcs = []
         self.get(url)
+        self.notfound = False
         if self.ui:
             printer = Printer()
             config = { "name" : "ErodoujinshiWorld", "screen-full" : True}

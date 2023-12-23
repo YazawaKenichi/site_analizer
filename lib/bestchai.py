@@ -10,7 +10,8 @@ class Bestchai:
     def __init__(self, url, ui = False):
         self.ui = ui
         self.get(url)
-    
+        self.notfound = False
+
     """ Get Bestchai Page """
     def get(self, url):
         self.update_url(url)

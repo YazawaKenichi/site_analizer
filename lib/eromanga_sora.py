@@ -17,6 +17,7 @@ class EromangaSora:
         self.srcs = []
         self.rensaku = []
         self.get(url)
+        self.notfound = False
         if self.ui:
             printer = Printer()
             config = { "name" : "EromangaSora", "screen-full" : True}
@@ -90,6 +91,7 @@ class EromangaSoras:
         self.srcs = []
         self.soras = []
         self.get(url)
+        self.notfound = False
         if self.ui:
             printer = Printer()
             config = { "name" : "EromangaSoras", "screen-full" : False}

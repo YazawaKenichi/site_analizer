@@ -22,6 +22,7 @@ class Mangalear:
         self.srcs = []
 
         self.get(url)
+        self.notfound = False
 
     """ Get Mangalear Page """
     def get(self, url):

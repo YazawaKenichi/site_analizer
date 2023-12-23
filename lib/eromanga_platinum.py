@@ -12,6 +12,7 @@ class EromangaPlatinum:
         self.update_artist_title_category()
         self.update_srcs()
         self.update_sitename()
+        self.notfound = False
         if ui :
             printer = Printer()
             config = { "name" : "EromangaPlatinum", "screen-full" : False}

@@ -14,6 +14,7 @@ class EromangaCeleb:
         self.update_category()
         self.update_srcs()
         self.update_sitename()
+        self.notfound = False
 
     def update_url(self, url):
         self.url = url

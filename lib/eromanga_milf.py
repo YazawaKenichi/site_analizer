@@ -17,6 +17,7 @@ class EromangaMilf:
         self.srcs = []
         self.rensaku = []
         self.get(url)
+        self.notfound = False
         if self.ui:
             printer = Printer()
             config = { "name" : "EromangaMilf", "screen-full" : True}
