@@ -87,6 +87,7 @@ class EromangaMilfs:
         self.srcs = []
         self.milfs = []
         self.get(url)
+        self.notfound = False
         if self.ui:
             printer = Printer()
             config = { "name" : "EromangaMilfs", "screen-full" : False}
