@@ -76,8 +76,8 @@ def showimagecli(binary, title = "", height = 128, width = 128, fxy = 1 / 3, ful
     if fullscreen:
         # ターミナルの文字数
         term_size = shutil.get_terminal_size()
-        wc_inrow = term_size # 列数
-        wc_inline = term_size - 2 # 行数
+        wc_inrow = term_size.columns # 列数
+        wc_inline = term_size.lines - 2 # 行数
     small_bin = scale_box(binary_push, wc_inrow, wc_inline)
     if ui:
         binary_original = copy.deepcopy(binary)
