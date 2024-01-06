@@ -49,6 +49,10 @@ def list2soup(_list, ui = False):
     soup = BeautifulSoup(li, "html.parser")
     return soup
 
+def str2soup(string, ui = False):
+    soup = BeautifulSoup(str(string), "html.parser")
+    return soup
+
 def print_element(elem):
     if isinstance(elem, bs4.NavigableString):
         print(type(elem), elem.string)
@@ -238,7 +242,8 @@ def file_download(url, filename, ui = False):
         except TimeoutError:
             print("[TimeoutError] Retry ... ")
             roop = True
-    fde.mkdir(os.path.dirname(filename))
+    if not os.path.dirname(filename) == ".":
+        fde.mkdir(os.path.dirname(filename))
     with open(filename, 'wb') as f:
         for chunk in r.iter_content(chunk_size = 1024):
             if chunk:

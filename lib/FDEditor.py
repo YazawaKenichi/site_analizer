@@ -3,11 +3,7 @@
 # FDEditor.py
 # ファイル・ディレクトリを操作
 
-SHUTIL = True
-try:
-    import shutil
-except ModuleNotFoundError:
-    SHUTIL = False
+import shutil
 
 import os
 
@@ -40,18 +36,31 @@ def convert_indir(download_dir, ext = ".png", ui = False):
         build = download_dir + image_name_split + ext
         convertor(src, build, ui = ui)
 
+# ディレクトリ名を取得 拡張子が指定されている場合はファイル名を削除
+# 指定されていない場合は そのまま返す
+def dirname(path):
+    _dirname = "./"
+    slash = path.rfind("/")
+    dot = path.rfind(".")
+    if slash < dot:
+        _dirname = os.path.dirname(path)
+    else:
+        _dirname = path
+    return str(_dirname)
+
 # ディレクトリ作成
-def mkdir(dirname, ui = False):
-    if not os.path.exists(dirname):
+def mkdir(path, ui = False):
+    _dirname = dirname(path)
+    if not os.path.exists(_dirname):
         try:
-            os.makedirs(dirname)
+            os.makedirs(_dirname)
         except OSError:
-            os.makedirs(dirname[0:32])
+            os.makedirs(_dirname[0:32])
         if ui:
-            print("[mkdir] mkdir -r " + dirname)
+            print("[mkdir] mkdir -r " + _dirname)
     else:
         if ui:
-            print("[mkdir] " + dirname + " is already exists.")
+            print("[mkdir] " + _dirname + " is already exists.")
 
 # ファイルの中身をまっさらにする
 def file_clear(filepath, ui = False):
@@ -60,9 +69,9 @@ def file_clear(filepath, ui = False):
 
 # 空のファイルを作成する
 def touch(filepath, ui = False):
-    dirname = os.path.dirname(filepath)
-    if not os.path.isdir(dirname):
-        mkdir(dirname)
+    _dirname = os.path._dirname(filepath)
+    if not os.path.isdir(_dirname):
+        mkdir(_dirname)
     if not os.path.exists(filepath):
         with open(filepath, mode = "w") as f:
             f.truncate(0)
@@ -110,10 +119,8 @@ def path2name(filepath, ui = False):
 
 # ディレクトリの削除
 def remove(path, trush = "./.trush/"):
-    global SHUTIL
     mkdir(trush, ui = False)
-    if SHUTIL:
-        shutil.move(path, trush)
+    shutil.move(path, trush)
 
 # ファイルから一致する行を削除
 def delinefromfile(path, string):
@@ -134,7 +141,10 @@ def rm(path, opt, ui = False):
     if ("f" in opt) or (yes.lower()[0] == "y"):
         if ui:
             print(f"削除 : {path}")
-        os.remove(path)
+        if not "r" in opt:
+            os.remove(path)
+        else:
+            shutil.rmtree(path)
         ret = 0
     else:
         ret = 1

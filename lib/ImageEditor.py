@@ -3,6 +3,8 @@
 # ImageEditor.py
 # 画像の操作
 
+import os
+import FDEditor as fde
 import cv2
 import shutil
 import copy
@@ -51,7 +53,15 @@ def rgb_gen(r, g, b, width = 256, height = 256):
 
 # 画像を保存
 def writeimage(img, filename = "out.png", ui = False):
-    cv2.imwrite(filename, img)
+    # テンポラリーファイルに一時保存
+    ext = pe.get_ext(filename)
+    tmp = "./tmp/__template__" + ext
+    fde.mkdir(tmp)
+    cv2.imwrite(tmp, img)
+    # ファイルの移動
+    fde.mkdir(filename)
+    os.rename(tmp, filename)
+    fde.rm("./tmp", "-rf")
 
 # 画像を表示
 def imshow(im, window_name = "Lorem Ipsum", ui = False):
@@ -71,8 +81,8 @@ def showimagecli(binary, title = "", height = 128, width = 128, fxy = 1 / 3, ful
     fx = 1
     fy = fx * fxy
     binary_push = cv2.resize(binary, dsize = None, fx = fx, fy = fy)
-    wc_inrow = width # 列数
-    wc_inline = height - 2 # 行数
+    wc_inrow = width.columns # 列数
+    wc_inline = height.lines - 2 # 行数
     if fullscreen:
         # ターミナルの文字数
         term_size = shutil.get_terminal_size()

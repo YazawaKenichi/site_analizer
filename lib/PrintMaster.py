@@ -2,6 +2,18 @@
 # coding : utf-8
 # PrintMaster
 
+"""
+printer = Printer()
+config = {
+    "name" : NAME,
+    "sub-name" : SUBNAME,
+    "len" : 32,
+    "screen-full" : True
+    }
+printer.setConfig(config)
+printer.print("Hello, World!")
+"""
+
 import sys
 import shutil
 import unicodedata
@@ -39,14 +51,14 @@ class Printer:
         if "name" in config.keys():
             if not config["name"] is None:
                 self.name = config["name"]
-                self.name_string = f"[{self.name}]"
+                self.name_string = f"[{self.name}] "
             else:
                 self.name = ""
                 self.name_string = ""
         if "sub-name" in config.keys():
             if not config["sub-name"] is None:
                 self.sub_name = config["sub-name"]
-                self.sub_string = f"[{self.sub_name}]"
+                self.sub_string = f"[{self.sub_name}] "
             else:
                 self.sub_name = ""
                 self.sub_string = ""
