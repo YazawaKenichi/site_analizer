@@ -26,10 +26,10 @@ def get_soup(address, ui = False):
     try:
         # ユーザエージェントの偽装
         user_agent = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.114 Safari/537.36'
-        header = { "User-Agent" : user_agent }
+        headers = getHeaders()
         # レスポンスの情報を管理するオブジェクトを返す
         # このオブジェクトからメソッドを呼び出して必要な情報を取り出す
-        with requests.get(address, headers = header) as response:
+        with requests.get(address, headers = headers) as response:
             time.sleep(0.5)
             # 取得した文字列をまとめて取り出す
             body = response.content
@@ -139,11 +139,7 @@ def show_image(url : str, title : str, scaling = 1, ui = False):
 # 画像のイメージを PIL.Image で取得
 def download_image_for_pil(url, sec = 1, ui = False):
     # ua_str = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36"
-    ua_str = "Mozilla/5.0 (iPhone; CPU iPhone OS 14_5 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) CriOS/91.0.4472.80 Mobile/15E148 Safari/604.1"
-    headers = {
-        'User-Agent': ua_str,
-        'content-type': 'application/json'
-    }
+    headers = getHeaders()
     try :
         response = requests.get(url, headers = headers)
         # HTTP ステータスコードの確認
@@ -228,12 +224,18 @@ def get_image_urls_in_anchor_in_tag_id(soup, id_, tag = "div"):
                 __srcs.append(str(__img["src"]))
     return __srcs
 
+def getHeaders():
+    headers = {
+            "User-Agent" : "Mozilla/5.0 (Windows NT 10.0; Win64; x64) Apple WebKit/537.36 (KHTML, like Gecko) Chrome/78.9.3904.97 Safari/537.36",
+            "content-type" : "application/json"
+            }
+    return headers
 
 # ファイルの種類によらず保存する
 def file_download(url, filename, ui = False):
     roop = True
     # ヘッダ偽造
-    headers = {"User-Agent" : "Mozilla/5.0 (Windows NT 10.0; Win64; x64) Apple WebKit/537.36 (KHTML, like Gecko) Chrome/78.9.3904.97 Safari/537.36"}
+    headers = getHeaders()
     while roop:
         try:
             time.sleep(5)

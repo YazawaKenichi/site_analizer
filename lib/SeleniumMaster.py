@@ -19,12 +19,13 @@ class Browser:
                     "name" : "Browser",
                     "screen-full" : True
                     }
-            self.setConfig(config)
+            self.printer.setConfig(self.config)
 
     # ブラウザを動かすためのクラスを作成する
     def initSelenium(self, browser = "/usr/bin/chromium-browser", driver = "/usr/bin/chromiumdriver"):
         options = Options()
-        options.add_argument("--headless")
+        if not self.ui:
+            options.add_argument("--headless")
         options.binary_location = browser
         self.driver = webdriver.Chrome(options = options)
 
@@ -51,4 +52,7 @@ class Browser:
         if self.ui:
             self.config["sub-name"] = "reload"
             self.printer.print("refresh")
+
+    def close(self):
+        self.driver.close()
 
