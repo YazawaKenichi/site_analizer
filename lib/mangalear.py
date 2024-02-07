@@ -22,7 +22,6 @@ class Mangalear:
         self.srcs = []
 
         self.get(url)
-        self.notfound = False
 
     """ Get Mangalear Page """
     def get(self, url):
@@ -39,6 +38,7 @@ class Mangalear:
     def update_url(self, _url):
         self.url = _url
         self.printer.print(f"Address : {self.url}")
+
     def update_soup(self):
         self.soup = sm.get_soup(self.url, ui  = False)
         if not self.isNotFound() == "":

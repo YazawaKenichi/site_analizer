@@ -154,4 +154,3 @@ def check_string_in_file(path, string):
     except Exception as e:
         return False
 
-

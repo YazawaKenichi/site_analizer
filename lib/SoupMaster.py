@@ -226,8 +226,9 @@ def get_image_urls_in_anchor_in_tag_id(soup, id_, tag = "div"):
 
 
 # ファイルの種類によらず保存する
-def file_download(url, filename, ui = False):
+def file_download(url, filename, count = 16, ui = False):
     roop = True
+    error = False
     # ヘッダ偽造
     headers = {"User-Agent" : "Mozilla/5.0 (Windows NT 10.0; Win64; x64) Apple WebKit/537.36 (KHTML, like Gecko) Chrome/78.9.3904.97 Safari/537.36"}
     while roop:

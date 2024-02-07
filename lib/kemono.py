@@ -4,7 +4,9 @@
 from PrintMaster import Printer
 from URLMaster import URL
 import SoupMaster as sm
+import FDEditor as fde
 import os
+from urllib import parse
 
 def extend(lista, listb):
     ret = []
@@ -28,28 +30,28 @@ class KemonoPost:
     """
 
     def __init__(self, _url, ui = False):
+        self.printer = Printer()
+        config = { "name" : "KemonoPost", "screen-full" : True }
+        self.printer.addConfig(config)
         self.ui = ui
         self.title = ""
         self.downloads = []
         self.content = ""
+        self.content_urls = []
         self.files = []
         self.comments = {}
-        self.get(_url)
-        if self.ui:
-            printer = Printer()
-            config = { "name" : "KemonoPost", "screen-full" : True }
-            printer.setConfig(config)
-            printer.print(f"Address : {self.url}")
-            printer.print(f"Title : {self.title}, Downloads : {len(self.downloads)}, Files : {len(self.files)}")
-
-    def get(self, _url):
         self.update_url(_url)
+        if self.ui:
+            self.printer.print(f"Address : {self.url}")
         self.update_soup()
+        self.update_artist()
         self.update_title()
         self.update_downloads()
         self.update_content()
         self.update_files()
         self.update_comments()
+        if self.ui:
+            self.printer.print(f"Artist : {self.artist}, Title : {self.title}, Downloads : {len(self.downloads)}, Files : {len(self.files)}")
 
     def update_url(self, _url):
         url = URL(_url)
@@ -59,10 +61,21 @@ class KemonoPost:
     def update_soup(self):
         self.soup = sm.get_soup(self.url, ui = False)
 
+    def update_artist(self):
+        class_ = "post__user-name"
+        a = self.soup.find("a", class_ = class_)
+        self.artist = a.text.replace("\n", "").replace("\r", "").replace(" ", "")
+
     def update_title(self):
-        h1 = self.soup.find(class_ = "post__title")
-        span = h1.find("span")
-        self.title = span.text
+        h1 = self.soup.find("h1", class_ = "post__title")
+        if not h1 is None:
+            span = h1.find("span")
+            self.title = span.text
+        else:
+            _name = URL(self.url).path.split("/")[-1]
+            fde.create_file(_name + ".html", str(self.soup))
+            printer.print(f"Output : {_name}")
+            sys.exit(0)
 
     def update_downloads(self):
         lists = self.soup.find_all(class_ = "post__attachment-link")
@@ -75,14 +88,24 @@ class KemonoPost:
         div = self.soup.find(class_ = "post__content")
         if not div is None:
             self.content = div.text
+            anchors = div.find_all("a")
+            for anchor in anchors:
+                self.content_urls.append(anchor["href"])
+                self.printer.print(f"{self.content_urls[-1]}", config = {"sub-name" : "Update Content"})
+            imgs = div.find_all("img")
+            for img in imgs:
+                self.content_urls.append(parse.urljoin(self.domain, img["src"]))
+                self.printer.print(f"{self.content_urls[-1]}", config = {"sub-name" : "Update Content"})
 
     def update_files(self):
-        anchor_class = ['fileThumb', 'image-link']
-        anchors = self.soup.find_all(class_ = anchor_class[0])
-        for anchor in anchors:
-            img = anchor.find('img')
-            address = f"https:{str(img['src'])}"
-            self.files.append(address)
+        divs = self.soup.find_all("div", class_ = "post__files")
+        for div in divs:
+            imgs = div.find_all('img')
+            anchors = div.find_all("a")
+            for img in imgs:
+                self.files.append(parse.urljoin(URL(self.url).scheme + ":", img["src"]))
+            for anchor in anchors:
+                self.files.append(anchor["href"])
 
     def update_comments(self):
         div = self.soup.find(class_ = "post__comments")
@@ -152,7 +175,7 @@ class Kemono:
         if self.ui:
             printer = Printer()
             config = { "name" : "Kemono", "screen-full" : True }
-            printer.setConfig(config)
+            printer.addConfig(config)
             printer.print(f"[Kemono] Address : {self.url.address}")
             printer.print(f"[Kemono] ID : {self.id}, Service : {self.service}, Artist : {self.artist}")
             printer.print(f"[Kemono] Pages : {len(self.pages)}")
@@ -200,3 +223,4 @@ class Kemono:
         for post_url in post_urls:
             kemonopost = KemonoPost(post_url, ui = self.ui)
             self.posts.append(kemonopost)
+

@@ -86,6 +86,7 @@ class EromangaMilfs:
         self.ui = ui
         self.srcs = []
         self.milfs = []
+        self.notfound = False
         self.get(url)
         if self.ui:
             printer = Printer()
