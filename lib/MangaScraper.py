@@ -47,7 +47,7 @@ class Manga2PDF:
 
         self.printer = Printer()
         config = {"name" : "MAIN", "screen-full" : True}
-        self.printer.setConfig(config)
+        self.printer.addConfig(config)
 
     def get_args(self):
         usage = "%prog"

@@ -232,8 +232,9 @@ def getHeaders():
     return headers
 
 # ファイルの種類によらず保存する
-def file_download(url, filename, ui = False):
+def file_download(url, filename, count = 16, ui = False):
     roop = True
+    error = False
     # ヘッダ偽造
     headers = getHeaders()
     while roop:

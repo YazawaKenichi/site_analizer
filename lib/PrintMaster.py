@@ -17,6 +17,7 @@ printer.print("Hello, World!")
 import sys
 import shutil
 import unicodedata
+import copy
 
 def get_east_asian_width_count(text):
     count = 0
@@ -36,41 +37,58 @@ class Printer:
         "screen-full" : True,
     }
     """
+    KEYLIST = {"name" : None, "sub-name" : None, "len" : 65536, "screen-full" : False, "enable" : True}
 
-    def __init__(self, enable = True):
-        self.prefix = ""
-        self.len = 65536
-        self.screen_full = False
-        self.enable = enable
+    def __init__(self, name = None, enable = True):
+        self.assignConfig(Printer.KEYLIST)
+        config = {"name" : name, "enable" : enable}
+        self.addConfig(config)
 
-    def setConfig(self, config):
+    # config 上書き / 新規作成
+    def assignConfig(self, config):
+        self.config = copy.deepcopy(Printer.KEYLIST)
+        for k in config.keys():
+            self.config[k] = config[k]
+        self.updatePrefix()
+
+    # config 追記
+    def addConfig(self, config):
+        for k in config.keys():
+            self.config[k] = config[k]
+        self.updatePrefix()
+
+    # config 取得
+    def getConfig(self):
+        return self.config
+
+    # prefix の更新
+    def updatePrefix(self):
+        self.name = self.config["name"]
+        self.sub_name = self.config["sub-name"]
+        self.len = self.config["len"]
+        self.screen_full = self.config["screen-full"]
+        self.enable = self.config["enable"]
+        self.generatePrefix()
+
+    # prefix の作成
+    def generatePrefix(self):
         self.prefix = ""
         self.name_string = ""
         self.sub_string = ""
-        self.config = config
-        if "name" in config.keys():
-            if not config["name"] is None:
-                self.name = config["name"]
-                self.name_string = f"[{self.name}] "
-            else:
-                self.name = ""
-                self.name_string = ""
-        if "sub-name" in config.keys():
-            if not config["sub-name"] is None:
-                self.sub_name = config["sub-name"]
-                self.sub_string = f"[{self.sub_name}] "
-            else:
-                self.sub_name = ""
-                self.sub_string = ""
-        if "len" in config.keys():
-            self.len = config["len"]
-        if "screen-full" in config.keys():
-            self.screen_full = config["screen-full"]
-        if "enable" in config.keys():
-            self.enable = config["enable"]
-        self.prefix = f"{self.name_string}{self.sub_string}"
+        if self.name is None:
+            name_string = ""
+        else:
+            name_string = f"[{self.name}]"
+        if self.sub_name is None:
+            sub_string = ""
+        else:
+            sub_string = f"[{self.sub_name}]"
+        self.prefix = f"{name_string}{sub_string}"
 
-    def print(self, string, end = "\r\n", file = sys.stdout, enable = None):
+    def print(self, string, config = {}, end = "\r\n", file = sys.stdout, enable = None):
+        buf = copy.deepcopy(self.getConfig())
+        self.addConfig(config)
+
         if self.screen_full:
             term_size = shutil.get_terminal_size()
             self.len = term_size.columns
@@ -81,4 +99,6 @@ class Printer:
             self.enable = enable
         if self.enable:
             print(message, end = end, file = file)
+
+        self.assignConfig(buf)
 

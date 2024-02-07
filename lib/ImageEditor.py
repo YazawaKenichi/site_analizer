@@ -72,7 +72,7 @@ def imshow(im, window_name = "Lorem Ipsum", ui = False):
     cv2.destroyAllWindows()
 
 # 画像を表示
-def showimage(filepath, window_name = "Lorem Ipsum", ui = False):
+def show_image_path(filepath, window_name = "Lorem Ipsum", ui = False):
     img = cv2.imread(filepath)
     imshow(img, window_name, ui = ui)
 
@@ -141,9 +141,4 @@ def trim(image, p1, p2):
     p2[1] = sl.limit(p2[1], 0, height)
     res = image[p1[1]:p2[1], p1[0]:p2[0]]
     return res
-
-# PIL 画像を表示
-def pilimshow(img, window_name = "Lorem Ipsum"):
-    img.show()
-    input()
 

@@ -19,9 +19,9 @@ class Buhidoh:
         self.update_soup()
         if not self.isNotFound():
             self.notfound = False
-            self.update_title()
             self.update_category()
             self.update_description()
+            self.update_title()
             self.update_srcs()
             self.update_sitename()
         else:
@@ -54,6 +54,7 @@ class Buhidoh:
 
     def update_title(self):
         self.title = self.url.replace("https://buhidoh.net/blog-entry-d", "").replace(".html", "")
+        self.title = self.category
 
     def update_category(self):
         tag = "div"
