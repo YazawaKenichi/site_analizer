@@ -69,7 +69,7 @@ class Buhidoh:
         class_ = "ently_title"
         div = self.soup.find(tag, class_ = class_)
         if not div is None:
-            text = div.text.replace("\n", "")
+            text = div.text.replace("\n", "").replace("\r", "")
         self.description = text
 
     def update_srcs(self):
