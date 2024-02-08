@@ -54,7 +54,7 @@ class Buhidoh:
 
     def update_title(self):
         self.title = self.url.replace("https://buhidoh.net/blog-entry-d", "").replace(".html", "")
-        self.title = self.category
+        self.title = self.description
 
     def update_category(self):
         tag = "div"
@@ -66,7 +66,7 @@ class Buhidoh:
     def update_description(self):
         text = ""
         tag = "h2"
-        class_ = "ently_category"
+        class_ = "ently_title"
         div = self.soup.find(tag, class_ = class_)
         if not div is None:
             text = div.text.replace("\n", "")
