@@ -16,7 +16,7 @@ class Mangalear:
 
         self.printer = Printer(self.ui)
         self.config = { "name" : "Mangalear", "screen-full" : False}
-        self.printer.setConfig(self.config)
+        self.printer.addConfig(self.config)
 
         self.tags = []
         self.srcs = []

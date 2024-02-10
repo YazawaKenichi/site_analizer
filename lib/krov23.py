@@ -15,7 +15,7 @@ class Krov23:
         self.ui = ui
         self.printer = Printer()
         config = { "name" : __class__.__name__, "screen-full" : False}
-        self.printer.setConfig(config)
+        self.printer.addConfig(config)
         self.get(url)
         self.notfound = False
         if self.ui:

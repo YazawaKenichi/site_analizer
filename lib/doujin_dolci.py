@@ -9,13 +9,14 @@ class DoujinDolci:
     def __init__(self, url, ui = False):
         self.update_url(url)
         self.update_soup()
-        self.update_title()
-        self.update_description()
-        self.update_category()
-        self.update_tags()
-        self.update_srcs()
-        self.update_sitename()
-        self.notfound = False
+        self.update_notfound()
+        if not self.notfound:
+            self.update_title()
+            self.update_description()
+            self.update_category()
+            self.update_tags()
+            self.update_srcs()
+            self.update_sitename()
 
         if ui :
             printer = Printer()
@@ -36,6 +37,13 @@ class DoujinDolci:
 
     def update_soup(self):
         self.soup = sm.get_soup(self.url)
+
+    def update_notfound(self):
+        div = self.soup.find("div", id = "main_col")
+        ul = div.find("ul")
+        self.notfound = False
+        if "該当する記事はありません" in ul.text:
+            self.notfound = True
 
     def update_title(self):
         tag = "h2"
