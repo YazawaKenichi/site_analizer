@@ -69,7 +69,7 @@ def file_clear(filepath, ui = False):
 
 # 空のファイルを作成する
 def touch(filepath, ui = False):
-    _dirname = os.path._dirname(filepath)
+    _dirname = os.path.dirname(filepath)
     if not os.path.isdir(_dirname):
         mkdir(_dirname)
     if not os.path.exists(filepath):
