@@ -37,26 +37,30 @@ class Mangalear:
     """ Update """
     def update_url(self, _url):
         self.url = _url
-        self.printer.print(f"Address : {self.url}")
+        if self.ui:
+            self.printer.print(f"Address : {self.url}")
 
     def update_soup(self):
         self.soup = sm.get_soup(self.url, ui  = False)
         if not self.isNotFound() == "":
             self.notfound = True
-            self.printer.print("404 Not Found")
+            if self.ui:
+                self.printer.print("404 Not Found")
 
     def update_title(self):
         tag = "h1"
         class_ = "entry-title"
         h1 = self.soup.find(tag, class_ = class_)
         self.title = h1.text.replace("\n", "")
-        self.printer.print(f"Title : {self.title}")
+        if self.ui:
+            self.printer.print(f"Title : {self.title}")
 
     def update_category(self):
         span = self.soup.find("span", class_ = "category")
         anchor = span.find("a")
         self.category = anchor.text
-        self.printer.print(f"Category : {self.category}")
+        if self.ui:
+            self.printer.print(f"Category : {self.category}")
 
     def update_tags(self):
         tag = "span"
@@ -65,7 +69,8 @@ class Mangalear:
         anchors = span.find_all("a")
         for anchor in anchors:
             self.tags.append(anchor.text)
-        self.printer.print(f"Tags : {self.tags}")
+        if self.ui:
+            self.printer.print(f"Tags : {self.tags}")
 
     def update_srcs(self):
         _src = []
@@ -76,7 +81,8 @@ class Mangalear:
         for __src in _srcs:
             if pe.isimage(__src):
                 self.srcs.append(__src)
-        self.printer.print(f"Srcs : {self.srcs}")
+        if self.ui:
+            self.printer.print(f"Srcs : {self.srcs}")
 
     def isNotFound(self):
         text = ""
