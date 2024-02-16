@@ -6,7 +6,8 @@ SITE_PACKAGES=$(python3 -c 'import site; print(site.getsitepackages()[0])')
 PTH_PATH="$SITE_PACKAGES/$LIB_NAME.$EXT"
 LIB_PATH="$(pwd)/lib"
 
-pip install img2pdf numpy opencv-python opencv-contrib-python BeautifulSoup4 pillow chardet requests
+sudo apt install python3-opencv
+pip install img2pdf numpy opencv-python opencv-contrib-python BeautifulSoup4 pillow chardet requests mega.py
 
 sudo echo $LIB_PATH > $PTH_PATH
 
