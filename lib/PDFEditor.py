@@ -42,7 +42,7 @@ def imgurllist2pdf(urls, path, sec = 1, ui = False):
                 print(f"[PDFEditor] {url} is image but unexcepted error.", file = sys.stderr)
                 print("\x1b[0m")
         else:
-            pil_image = pil_image_raw.convert("RGB")
+            pil_image = pil_image_raw.convert("RGBA")
             # PIL.Image をリストに追加する
         if ret == 0:
             ret = able

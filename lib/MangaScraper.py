@@ -30,6 +30,7 @@ from nuki_dokoro import NukiDokoro
 from doujin_dolci import DoujinDolci
 from krov23 import Krov23
 from dojinwatch import DojinWatch
+from nijicollage import Nijicollage
 
 class Manga2PDF:
     def __init__(self):
@@ -155,6 +156,8 @@ class Manga2PDF:
             r = Krov23(a, ui = ui)
         if "dojinwatch" in s:
             r = DojinWatch(a, ui = ui)
+        if "nijicollage" in s:
+            r = Nijicollage(a, ui = ui)
         if r is None:
             self.printer.print("[Error] Undefined Web Site")
         return r
@@ -174,6 +177,11 @@ class Manga2PDF:
             if not "end" in address.lower():
                 self.printer.print("Next ...")
                 self.printer.print(f"[Address] {address}")
+                """
+                manga.title : PDF ファイル名
+                manga.sitename : 親ディレクトリ名
+                manga.category : 子ディレクトリ名
+                """
                 manga = self.discrimination(address, ui = self.detail)
                 if not manga is None:
                     if not manga.notfound:
