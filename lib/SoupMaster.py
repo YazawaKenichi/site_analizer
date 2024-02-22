@@ -22,14 +22,14 @@ import os
 import numpy as np
 
 # アドレスの BeautifulSoup を返す
-def get_soup(address, ui = False):
+def get_soup(address, cookies = None, ui = False):
     try:
         # ユーザエージェントの偽装
         user_agent = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.114 Safari/537.36'
         headers = getHeaders()
         # レスポンスの情報を管理するオブジェクトを返す
         # このオブジェクトからメソッドを呼び出して必要な情報を取り出す
-        with requests.get(address, headers = headers) as response:
+        with requests.get(address, headers = headers, cookies = cookies) as response:
             time.sleep(0.5)
             # 取得した文字列をまとめて取り出す
             body = response.content
