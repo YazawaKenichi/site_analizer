@@ -91,11 +91,11 @@ class KemonoPost:
             anchors = div.find_all("a")
             for anchor in anchors:
                 self.content_urls.append(anchor["href"])
-                self.printer.print(f"{self.content_urls[-1]}", config = {"sub-name" : "Update Content"})
+                # self.printer.print(f"{self.content_urls[-1]}", config = {"sub-name" : "Update Content"})
             imgs = div.find_all("img")
             for img in imgs:
                 self.content_urls.append(parse.urljoin(self.domain, img["src"]))
-                self.printer.print(f"{self.content_urls[-1]}", config = {"sub-name" : "Update Content"})
+                # self.printer.print(f"{self.content_urls[-1]}", config = {"sub-name" : "Update Content"})
 
     def update_files(self):
         divs = self.soup.find_all("div", class_ = "post__files")
@@ -171,14 +171,11 @@ class Kemono:
 
     def __init__(self, url, ui = False):
         self.ui = ui
+        self.detail = True
+        self.printer = Printer()
+        config = { "name" : "Kemono", "screen-full" : True }
+        self.printer.addConfig(config)
         self.get(url)
-        if self.ui:
-            printer = Printer()
-            config = { "name" : "Kemono", "screen-full" : True }
-            printer.addConfig(config)
-            printer.print(f"[Kemono] Address : {self.url.address}")
-            printer.print(f"[Kemono] ID : {self.id}, Service : {self.service}, Artist : {self.artist}")
-            printer.print(f"[Kemono] Pages : {len(self.pages)}")
 
     """ Get Bestchai Page """
     def get(self, url):
@@ -193,9 +190,13 @@ class Kemono:
     """ Update """
     def update_url(self, _url):
         self.url = URL(_url)
+        if self.ui:
+            self.printer.print(f"{self.url.address}", config = {"sub-name" : "update_url", "screen-full" : False})
 
     def update_soup(self):
         self.soup = sm.get_soup(self.url.basename, ui  = False)
+        if self.detail:
+            self.printer.print(f"{self.soup}", config = {"sub-name" : "update_soup", "screen-full" : False})
 
     def update_meta(self):
         head = self.soup.find("head")
