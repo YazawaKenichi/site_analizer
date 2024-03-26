@@ -30,7 +30,7 @@ from nuki_dokoro import NukiDokoro
 from doujin_dolci import DoujinDolci
 from krov23 import Krov23
 from dojinwatch import DojinWatch
-from nijicollage import Nijicollage
+from nijicollage import NijicollagePost
 
 class Manga2PDF:
     def __init__(self):
@@ -157,7 +157,7 @@ class Manga2PDF:
         if "dojinwatch" in s:
             r = DojinWatch(a, ui = ui)
         if "nijicollage" in s:
-            r = Nijicollage(a, ui = ui)
+            r = NijicollagePost(a, ui = ui)
         if r is None:
             self.printer.print("[Error] Undefined Web Site")
         return r

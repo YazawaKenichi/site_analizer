@@ -1,0 +1,11 @@
+img2pdf
+numpy
+opencv-python
+opencv-contrib-python
+BeautifulSoup4
+pillow
+chardet
+requests
+mega.py
+readchar
+

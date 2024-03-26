@@ -7,7 +7,7 @@ PTH_PATH="$SITE_PACKAGES/$LIB_NAME.$EXT"
 LIB_PATH="$(pwd)/lib"
 
 sudo apt install python3-pip python3-opencv
-pip install img2pdf numpy opencv-python opencv-contrib-python BeautifulSoup4 pillow chardet requests mega.py
+pip install -r requirements.txt
 
 echo $LIB_PATH > __tmp__
 
