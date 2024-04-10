@@ -90,8 +90,9 @@ class KemonoPost:
             self.content = div.text
             anchors = div.find_all("a")
             for anchor in anchors:
-                self.content_urls.append(anchor["href"])
-                # self.printer.print(f"{self.content_urls[-1]}", config = {"sub-name" : "Update Content"})
+                if URL(anchor["href"]).is_url:
+                    self.content_urls.append(anchor["href"])
+                    # self.printer.print(f"{self.content_urls[-1]}", config = {"sub-name" : "Update Content"})
             imgs = div.find_all("img")
             for img in imgs:
                 self.content_urls.append(parse.urljoin(self.domain, img["src"]))
@@ -195,7 +196,7 @@ class Kemono:
 
     def update_soup(self):
         self.soup = sm.get_soup(self.url.basename, ui  = False)
-        if self.detail:
+        if False:
             self.printer.print(f"{self.soup}", config = {"sub-name" : "update_soup", "screen-full" : False})
 
     def update_meta(self):

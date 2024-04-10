@@ -4,6 +4,7 @@
 
 import re
 from urllib.parse import unquote
+from sys import stderr
 
 class URL:
     """ URL Analizer """
@@ -26,13 +27,17 @@ class URL:
 
     def get(self, url):
         self.update_address(url)
-        self.update_scheme()
-        self.update_fqdn()
-        self.update_path()
-        self.update_param()
-        self.update_flag()
-        self.update_basename()
-        self.update_domain()
+        self.isURL(url)
+        if self.is_url:
+            self.update_scheme()
+            self.update_fqdn()
+            self.update_path()
+            self.update_param()
+            self.update_flag()
+            self.update_basename()
+            self.update_domain()
+        else:
+            print(f"[URLMaster][isURL] Invalied URL : {url}")
 
     def update_address(self, url):
         self.address = unquote(url)
@@ -72,6 +77,16 @@ class URL:
 
     def debug(self):
         print(f"Address : {self.address}\n\tScheme : {self.scheme}\n\t FQDN  : {self.fqdn}\n\t path  : {self.path}\n\tparam  : {self.param}\n\t flag  : {self.flag}")
+
+    def isURL(self, text):
+        url_pattern = re.compile(
+            r'^(http|https)://'  # protocol
+            r'([0-9a-zA-Z.-]+)'  # domain
+            r'(\.[a-zA-Z]{2,})'   # top-level domain
+            r'(/[^\s]*)?'        # path
+            r'$'
+            )
+        self.is_url = bool(url_pattern.match(text))
 
     """ 開発中 """
     def set_param(self, _param:dict):
