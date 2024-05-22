@@ -52,10 +52,13 @@ def dirname(path):
 def mkdir(path, ui = False):
     _dirname = dirname(path)
     if not os.path.exists(_dirname):
-        try:
+        if True:
             os.makedirs(_dirname)
-        except OSError:
-            os.makedirs(_dirname[0:32])
+        else:
+            try:
+                os.makedirs(_dirname)
+            except OSError:
+                os.makedirs(_dirname[0:32])
         if ui:
             print("[mkdir] mkdir -r " + _dirname)
     else:

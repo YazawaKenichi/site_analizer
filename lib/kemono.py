@@ -64,7 +64,16 @@ class KemonoPost:
     def update_artist(self):
         class_ = "post__user-name"
         a = self.soup.find("a", class_ = class_)
-        self.artist = a.text.replace("\n", "").replace("\r", "").replace(" ", "")
+        try:
+            self.artist = a.text.replace("\n", "").replace("\r", "").replace(" ", "")
+        except AttributeError:
+            import sys
+            print("URL")
+            print(self.url)
+            print("AttributeError")
+            print(self.soup)
+            fde.create_file("./errorpage.html", self.soup)
+            sys.exit(0)
 
     def update_title(self):
         h1 = self.soup.find("h1", class_ = "post__title")
