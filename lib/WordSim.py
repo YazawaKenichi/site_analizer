@@ -1,7 +1,5 @@
 #!/usr/bin/env python3
 
-import os
-import argparse
 import re
 import sys
 import phonetics
@@ -10,40 +8,6 @@ from scipy.spatial.distance import euclidean, cosine
 import fuzzy
 import gensim.downloader as api
 from janome.tokenizer import Tokenizer, Token
-
-def getArgs():
-    parser = argparse.ArgumentParser()
-    parser.add_argument("que",
-            action = "store",
-            default = None,
-            # dest = "que",
-            help = "比較対象",
-            metavar = "QUE",
-            # required = True,
-            type = str,
-            )
-    parser.add_argument("ref",
-            action = "store",
-            default = None,
-            # dest = "ref",
-            help = "比較対象",
-            metavar = "REF",
-            # required = True,
-            type = str,
-            )
-    parser.add_argument("-m", "--model",
-            action = "store",
-            default = "./w2v/ja/ja.bin",
-            dest = "model",
-            help = "Word to Vector Model Binaly File PATH",
-            metavar = "MODEL_PATH",
-            required = False,
-            type = str,
-            )
-    return parser.parse_args()
-
-def isAscii(s):
-    return all(ord(c) < 128 for c in s)
 
 # 類似度を格納する構造体
 class Similarity:
@@ -238,6 +202,43 @@ class CosineSimilarity:
         return self.res
 
 if __name__ == "__main__":
+    import argparse
+    import os
+
+    def getArgs():
+        parser = argparse.ArgumentParser()
+        parser.add_argument("que",
+                action = "store",
+                default = None,
+                # dest = "que",
+                help = "比較対象",
+                metavar = "QUE",
+                # required = True,
+                type = str,
+                )
+        parser.add_argument("ref",
+                action = "store",
+                default = None,
+                # dest = "ref",
+                help = "比較対象",
+                metavar = "REF",
+                # required = True,
+                type = str,
+                )
+        parser.add_argument("-m", "--model",
+                action = "store",
+                default = "./w2v/ja/ja.bin",
+                dest = "model",
+                help = "Word to Vector Model Binaly File PATH",
+                metavar = "MODEL_PATH",
+                required = False,
+                type = str,
+                )
+        return parser.parse_args()
+
+    def isAscii(s):
+        return all(ord(c) < 128 for c in s)
+
     args = getArgs()
 
     s1 = args.que
