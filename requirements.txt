@@ -9,4 +9,9 @@ requests
 mega.py
 readchar
 pyautogui
+phonetics
+gensim
+fuzzy
+scipy
+janome
 

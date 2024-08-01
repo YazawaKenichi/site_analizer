@@ -6,8 +6,17 @@ SITE_PACKAGES=$(python3 -c 'import site; print(site.getsitepackages()[0])')
 PTH_PATH="$SITE_PACKAGES/$LIB_NAME.$EXT"
 LIB_PATH="$(pwd)/lib"
 
-sudo apt install -y python3-pip python3-opencv
+sudo apt update -y && sudo apt upgrade -y
+sudo apt install -y python3-pip python3-opencv libopencv-dev python3-scipy
 pip install -r requirements.txt
+
+mkdir models
+git clone git@hf.co:YazawaKenichi/WordVectors-Pre-trained-Models models/w2v
+
+# MeCab のインストール
+# sudo apt install -y mecab libmecab-dev mecab-ipadic-utf8
+# pip install mecab-python3 unidic
+# python3 -m unidic download
 
 echo $LIB_PATH > __tmp__
 
