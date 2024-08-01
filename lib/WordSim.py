@@ -20,6 +20,7 @@ class Similarity:
 class LevenshteinDistance:
     def __init__(self):
         self.res = Similarity()
+        self.description = "ある単語を別の単語に変換するために必要な最小の編集操作回数"
     def distance(self, s1, s2):
         m, n = len(s1), len(s2)
         # Create a matrix to hold the distances
@@ -63,6 +64,7 @@ class EuclideanDistance:
         self.model = None
         self.model = KeyedVectors.load_word2vec_format(model, binary = True)
         self.model = api.load(model)
+        self.description = "開発中"
     def distance(self, a, b):
         distance = None
         if not self.model is None:
@@ -82,6 +84,7 @@ class EuclideanDistance:
 class JaccardSimilarity:
     def __init__(self):
         self.res = Similarity()
+        self.description = "二つの集合間の共通要素の割合"
     def distance(self, a, b):
         s1 = set(a)
         s2 = set(b)
@@ -134,10 +137,11 @@ class WordMoversDistance:
         self.res = Similarity(a, b, d, t)
         return self.res
 
-# フォネティック類似度 ( 開発中 ）
+# フォネティック類似度
 class PhoneticSimilarity:
     def __init__(self):
         self.res = Similarity()
+        self.description = "単語の発音（音素）一致不一致"
     def distance(self, a, b):
         ret = None
         try:
@@ -161,6 +165,7 @@ class PhoneticSimilarity:
 class NSyllableSimilarity:
     def __init__(self):
         self.res = Similarity()
+        self.description = "音節の個数比"
     def count_syllables(self, w):
         w = w.lower()
         w = re.sub(r"[aeiouy]+", "a", w)
@@ -176,7 +181,16 @@ class NSyllableSimilarity:
             ret = _min / _max
         return ret
     def similarity(self, distance):
-        return "開発中"
+        ret = ""
+        if distance == 1.0:
+            ret = "完全に一致"
+        elif distance >= 0.7:
+            ret = "割と似てる"
+        elif distance >= 0.4:
+            ret = "なんとも言えない"
+        else:
+            ret = "だいぶ違う"
+        return ret
     def result(self, a, b):
         d = self.distance(a, b)
         t = self.similarity(d)
