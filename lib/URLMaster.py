@@ -49,8 +49,14 @@ class URL:
         self.fqdn = self.address.split(f"{self.scheme}://")[1].split("/")[0]
 
     def update_path(self):
-        _path = self.address.split(f"{self.scheme}://{self.fqdn}/")[1]
-        self.path = re.split("[?#]", _path)[0]
+        try:
+            _path = self.address.split(f"{self.scheme}://{self.fqdn}/")[1]
+            self.path = re.split("[?#]", _path)[0]
+            return 0
+        except IndexError:
+            print(f"[URLMaster][URL][update_path] IndexError")
+            print(f"[URLMaster][URL][update_path] Address : {self.address}")
+            return 1
 
     def update_param(self):
         _dict = {}
