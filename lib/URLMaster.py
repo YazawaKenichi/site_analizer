@@ -56,6 +56,7 @@ class URL:
         except IndexError:
             print(f"[URLMaster][URL][update_path] IndexError")
             print(f"[URLMaster][URL][update_path] Address : {self.address}")
+            self.path = ""
             return 1
 
     def update_param(self):
