@@ -1,4 +1,7 @@
+#!/bin/bash
 #!/bin/bash -vx
+
+echo "=== Library Install Process ==="
 
 LIB_NAME="site_analizer"
 EXT="pth"
@@ -11,7 +14,15 @@ sudo apt install -y python3-pip python3-opencv libopencv-dev python3-scipy
 pip install -r requirements.txt
 
 mkdir models
+echo " ... Models Install Process ..."
 git clone git@hf.co:YazawaKenichi/WordVectors-Pre-trained-Models models/w2v
+
+if [ $? -eq 0 ] ; then
+    echo "... Collect ..."
+else
+    echo "Models Download Error"
+    echo "... Failed ..."
+fi
 
 # MeCab のインストール
 # sudo apt install -y mecab libmecab-dev mecab-ipadic-utf8
@@ -23,8 +34,9 @@ echo $LIB_PATH > __tmp__
 sudo mv __tmp__ $PTH_PATH
 
 if [ $? -eq 0 ] ; then
-    echo "Installed"
+    echo "=== Installed ==="
 else
-    echo "Error"
+    echo "This Libraries was Install Error"
+    echo "=== Failed ==="
 fi
 
