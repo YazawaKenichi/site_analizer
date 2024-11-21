@@ -14,4 +14,5 @@ gensim
 fuzzy
 scipy
 janome
+pynput
 
