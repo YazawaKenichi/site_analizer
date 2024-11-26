@@ -1,4 +1,3 @@
-#!/bin/bash
 #!/bin/bash -vx
 
 echo "=== Library Install Process ==="
@@ -10,7 +9,7 @@ PTH_PATH="$SITE_PACKAGES/$LIB_NAME.$EXT"
 LIB_PATH="$(pwd)/lib"
 
 sudo apt update -y && sudo apt upgrade -y
-sudo apt install -y python3-pip python3-opencv libopencv-dev python3-scipy
+sudo apt install -y python3-pip python3-opencv libopencv-dev python3-scipy python3-img2pdf
 pip install -r requirements.txt
 
 mkdir models
