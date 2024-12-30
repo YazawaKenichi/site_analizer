@@ -1,3 +1,4 @@
+opencv-python
 img2pdf
 numpy
 BeautifulSoup4
