@@ -9,6 +9,7 @@ import FDEditor as fde
 import PDFEditor as pdfe
 import PathEditor as pe
 
+from tqdm import tqdm
 from optparse import OptionParser
 from PrintMaster import Printer
 from URLMaster import URL
@@ -175,7 +176,7 @@ class Manga2PDF:
         return error
 
     def main(self):
-        for address_index, address in enumerate(self.addresses):
+        for address_index, address in enumerate(tqdm(self.addresses, file = sys.stdout)):
             errored = False
             if not "end" in address.lower():
                 self.printer.print("Next ...")
@@ -205,7 +206,7 @@ class Manga2PDF:
                                 rensaku = manga.rensaku
                             except:
                                 rensaku = [address]
-                            for add in rensaku:
+                            for add in tqdm(rensaku, file = sys.stdout):
                                 fde.add_file_end(self.log, add, duplicate = False)
                     else:
                         self.printer.print("[Error] NotFound")

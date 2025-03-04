@@ -34,8 +34,8 @@ def imgurllist2pdf(urls, path, sec = 1, ui = False):
         able, pil_image_raw = sm.download_image_for_pil(url, sec = sec, ui = ui)
         if able == 404 or able == 408:
             printer.print("\x1b[31m")
-            printer.print(f"[PDFEditor] {ret} HTTP Error")
-            printer.print(f"[PDFEditor] {ret} HTTP Error", file = sys.stderr)
+            printer.print(f"[PDFEditor] {able} HTTP Error")
+            printer.print(f"[PDFEditor] {able} HTTP Error", file = sys.stderr)
             printer.print("\x1b[0m")
         elif able == -1:
             if pe.isimage(url, ui = ui):

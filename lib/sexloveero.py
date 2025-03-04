@@ -18,10 +18,13 @@ class SexLoveEro:
     def get(self, url):
         self.update_url(url)
         self.update_soup()
+        self.update_sitename()
         self.update_notfound()
         if not self.notfound:
             self.update_title()
             self.update_description()
+            self.update_tags()
+            self.update_category()
             self.update_srcs()
 
     """ SoupMaster Edit """
@@ -54,7 +57,7 @@ class SexLoveEro:
     def update_tags(self):
         span = self.soup.find("span", class_ = "cat-links")
         anchors = span.find_all("a")
-        self.tags = [ v. for v in anchors ]
+        self.tags = [ v.text for v in anchors ]
 
     def update_category(self):
         self.category = self.tags[0]
