@@ -20,9 +20,13 @@ import FDEditor as fde
 import io
 import os
 import numpy as np
+from PrintMaster import Printer
 
 # アドレスの BeautifulSoup を返す
-def get_soup(address, cookies = None, ui = False):
+def get_soup(address, parser = "html.parser", cookies = None, ui = False):
+    config = {"name" : "SoupMaster", "sub-name" : "get_soup", "screen-full" : True}
+    printer = Printer()
+    printer.addConfig(config)
     try:
         # ユーザエージェントの偽装
         user_agent = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.114 Safari/537.36'
@@ -35,12 +39,12 @@ def get_soup(address, cookies = None, ui = False):
             body = response.content
             data = body
             if ui:
-                print("[open] " + address)
-            soup = BeautifulSoup(data, "html.parser")
+                printer.print("[open] " + address)
+            soup = BeautifulSoup(data, parser)
             return soup
     except (urllib.error.URLError, urllib.error.HTTPError) as e:
         if ui :
-            print("\x1b[31m" + address + " : Time Out!" + "\x1b[0m", file = sys.stderr)
+            printer.print("\x1b[31m" + address + " : Time Out!" + "\x1b[0m", file = sys.stderr)
         time.sleep(0.5)
         get_soup(address, ui)
 
@@ -54,10 +58,13 @@ def str2soup(string, ui = False):
     return soup
 
 def print_element(elem):
+    config = {"name" : "SoupMaster", "sub-name" : "print_element", "screen-full" : True}
+    printer = Printer()
+    printer.addConfig(config)
     if isinstance(elem, bs4.NavigableString):
-        print(type(elem), elem.string)
+        printer.print(type(elem), elem.string)
     else:
-        print(type(elem), elem.name)
+        printer.print(type(elem), elem.name)
 
 def get_tags(soup, tag = "div"):
     list_ = soup.find_all(tag)
@@ -75,16 +82,22 @@ def get_tags_from_id(soup, id, tag = "div", ui = False):
 
 # <a class = anchor_class href = "***" ></a>
 def get_hrefs(soup, anchor_class, ui = False):
+    config = {"name" : "SoupMaster", "sub-name" : "get_hrefs", "screen-full" : True}
+    printer = Printer()
+    printer.addConfig(config)
     lists = soup.find_all(class_ = anchor_class)
     hrefs = []
     for li in lists:
         hrefs.append(str(li['href']))
         if ui:
-            print("[append] " + str(li['href']))
+            printer.print("[append] " + str(li['href']))
     return hrefs
 
 # <tag class = tag_class><a href = "***"></a></tag>
 def get_hrefs_from_tag_in_anchor(soup, class_, tag = "div", recursion = True, ui = False):
+    config = {"name" : "SoupMaster", "sub-name" : "get_hrefs_from_tag_in_anchor", "screen-full" : True}
+    printer = Printer()
+    printer.addConfig(config)
     # tag_class を持つ tag のリストを取得する
     lists = get_tags_from_class(soup, class_ = class_, tag = tag, ui = ui)
     hrefs = []
@@ -94,7 +107,7 @@ def get_hrefs_from_tag_in_anchor(soup, class_, tag = "div", recursion = True, ui
         for anchor in anchors:
             hrefs.append(str(anchor['href']))
     if ui:
-        print("[get] ", lists)
+        printer.print("[get] ", lists)
     return hrefs
 
 # <tag class = tag_class> **** </tag>
@@ -119,6 +132,9 @@ def exist_href(soup, anchor_class, ui = False):
 
 # URL の画像を表示する
 def show_image(url : str, title : str, scaling = 1, ui = False):
+    config = {"name" : "SoupMaster", "sub-name" : "show_image", "screen-full" : True}
+    printer = Printer()
+    printer.addConfig(config)
     try:
         time.sleep(1)
         with requests.get(url, stream = True).raw as resp:
@@ -127,17 +143,20 @@ def show_image(url : str, title : str, scaling = 1, ui = False):
             rescale_size = scaling
             image = cv2.resize(image, dsize = None, fx = rescale_size, fy = rescale_size)
             if ui:
-                print("[show] " + url)
+                printer.print("[show] " + url)
             cv2.imshow(title, image)
     except (urllib.error.URLError, urllib.error.HTTPError) as e:
         if ui:
-            print("\x1b[31m" + url + " : Time Out!" + "\x1b[0m", file = sys.stderr)
+            printer.print("\x1b[31m" + url + " : Time Out!" + "\x1b[0m", file = sys.stderr)
         time.sleep(0.5)
         # 取得できなかったときは再帰
         show_image(url, title, ui)
 
 # 画像のイメージを PIL.Image で取得
 def download_image_for_pil(url, sec = 1, ui = False):
+    config = {"name" : "SoupMaster", "sub-name" : "download_image_for_pil", "screen-full" : True}
+    printer = Printer()
+    printer.addConfig(config)
     # ua_str = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36"
     headers = getHeaders()
     try :
@@ -145,22 +164,22 @@ def download_image_for_pil(url, sec = 1, ui = False):
         # HTTP ステータスコードの確認
         response.raise_for_status()
         if ui:
-            print(f"Status Code : {response.status_code}")
+            printer.print(f"Status Code : {response.status_code}")
         content = response.content
         time.sleep(sec)
     except requests.exceptions.MissingSchema as e:
         if ui:
-            print("\x1b[31m")
-            print(f"[SoupMaster] リクエストが返されませんでした > Error Code({e}) > URL({url})")
-            print(f"[SoupMaster] リクエストが返されませんでした > Error Code({e}) > URL({url})", file = sys.stderr)
-            print("\x1b[0m")
+            printer.print("\x1b[31m")
+            printer.print(f"[SoupMaster] リクエストが返されませんでした > Error Code({e}) > URL({url})")
+            printer.print(f"[SoupMaster] リクエストが返されませんでした > Error Code({e}) > URL({url})", file = sys.stderr)
+            printer.print("\x1b[0m")
         return 408, None
     except requests.exceptions.RequestException as e:
         if ui:
-            print("\x1b[31m")
-            print(f"[SoupMaster] リクエストが返されませんでした > Error Code({e}) > URL({url})")
-            print(f"[SoupMaster] リクエストが返されませんでした > Error Code({e}) > URL({url})", file = sys.stderr)
-            print("\x1b[0m")
+            printer.print("\x1b[31m")
+            printer.print(f"[SoupMaster] リクエストが返されませんでした > Error Code({e}) > URL({url})")
+            printer.print(f"[SoupMaster] リクエストが返されませんでした > Error Code({e}) > URL({url})", file = sys.stderr)
+            printer.print("\x1b[0m")
         return 408, None
     image_data = io.BytesIO(content)
     try :
@@ -173,21 +192,24 @@ def download_image_for_pil(url, sec = 1, ui = False):
             return 0, im
     except UnidentifiedImageError as e:
         if ui:
-            print("\x1b[31m")
-            print(f"[SoupMaster] 画像の取得に失敗 > Error Code({e}) > URL({url})")
-            print(f"[SoupMaster] 画像の取得に失敗 > Error Code({e}) > URL({url})", file = sys.stderr)
-            print("\x1b[0m")
+            printer.print("\x1b[31m")
+            printer.print(f"[SoupMaster] 画像の取得に失敗 > Error Code({e}) > URL({url})")
+            printer.print(f"[SoupMaster] 画像の取得に失敗 > Error Code({e}) > URL({url})", file = sys.stderr)
+            printer.print("\x1b[0m")
         return -1, None
 
 # <a class="anchor_class"> <img src="***"> </a> の *** の部分をリスト化して取り出す
 def get_image_urls(soup, anchor_class, ui = False):
+    config = {"name" : "SoupMaster", "sub-name" : "get_image_urls", "screen-full" : True}
+    printer = Printer()
+    printer.addConfig(config)
     anchors = soup.find_all("a", class_ = anchor_class)
     hrefs = []
     for anchor in anchors:
         img = anchor.find('img')
         hrefs.append(str(img['src']))
         if ui:
-            print("[append] " + str(img['src']))
+            printer.print("[append] " + str(img['src']))
     return hrefs
 
 # <tag class="CLASS" id="ID"><img src="***"><img src="***"> ... </tag>
@@ -229,10 +251,20 @@ def getHeaders():
             "User-Agent" : "Mozilla/5.0 (Windows NT 10.0; Win64; x64) Apple WebKit/537.36 (KHTML, like Gecko) Chrome/78.9.3904.97 Safari/537.36",
             "content-type" : "application/json"
             }
+    headers = {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+            'Accept-Language': 'en-US,en;q=0.9',
+            'Accept-Encoding': 'gzip, deflate',
+            'Connection':
+            'keep-alive'
+            }
     return headers
 
 # ファイルの種類によらず保存する
 def file_download(url, filename, count = 16, ui = False):
+    config = {"name" : "SoupMaster", "sub-name" : "file_download", "screen-full" : True}
+    printer = Printer()
+    printer.addConfig(config)
     roop = True
     error = False
     # ヘッダ偽造
@@ -243,7 +275,7 @@ def file_download(url, filename, count = 16, ui = False):
             r = requests.get(url, stream = True, headers = headers)
             roop = False
         except TimeoutError:
-            print("[TimeoutError] Retry ... ")
+            printer.print("[TimeoutError] Retry ... ")
             roop = True
     if not os.path.dirname(filename) == ".":
         fde.mkdir(os.path.dirname(filename))
@@ -253,7 +285,7 @@ def file_download(url, filename, count = 16, ui = False):
                 f.write(chunk)
                 f.flush()
     if ui:
-        print(f"[Write] {url} -> {filename}")
+        printer.print(f"[Write] {url} -> {filename}")
 
 # 特定のタグ内の要素を取り出す
 def get_elements(soup, tag):
