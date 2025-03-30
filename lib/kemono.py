@@ -155,7 +155,7 @@ class KemonoPage:
         self.posts.reverse()
 
     def update_next(self):
-        anchor = self.soup.find(class_ = "next")
+        anchor = self.soup.find(class_ = "fancy-link fancy-link--kemono next")
         if not anchor is None:
             self.next = self.domain + anchor["href"]
 
@@ -205,7 +205,7 @@ class Kemono:
 
     def update_soup(self):
         self.soup = sm.get_soup(self.url.basename, ui  = False)
-        if False:
+        if self.ui:
             self.printer.print(f"{self.soup}", config = {"sub-name" : "update_soup", "screen-full" : False})
 
     def update_meta(self):
@@ -224,6 +224,9 @@ class Kemono:
             address = kemonopage.next
             if address is None:
                 exist_next = False
+            if self.ui:
+                self.printer.print(f"Next Page Address : {address}", config = {"sub-name" : "update_pages", "screen-full" : True})
+                self.printer.print(f"Exist Next : {exist_next}", config = {"sub-name" : "update_pages", "screen-full" : True})
         self.pages.reverse()
 
     def update_posts(self):
