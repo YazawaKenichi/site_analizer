@@ -8,13 +8,22 @@ from bs4 import BeautifulSoup
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from PrintMaster import Printer
-from optparse import OptionParser
+import argparse
+
+"""
+from SeleniumMaster import Browser
+
+initSelenium()
+"""
 
 class Browser:
     def __init__(self, browser = "/usr/bin/chromium-browser", driver = "/usr/bin/chromiumdriver", ui = False):
         self.ui = ui
-        browser = self.getArgs()
-        self.initSelenium(browser, ui)
+        self.args, _ = self.__getArgs(browser, driver)
+        self.driver_path = self.args.driver
+        self.browser_path = self.args.browser
+        self.cookies = self.args.cookies
+        self.initSelenium()
         if self.ui:
             self.printer = Printer()
             self.config = {
@@ -23,30 +32,37 @@ class Browser:
                     }
             self.printer.setConfig(self.config)
 
-    def getArgs(self):
-        parser = OptionParser()
-        parser.add_option(
+    def __getArgs(self, browser = "/usr/bin/chromium-browser", driver = "/usr/bin/chromiumdriver", cookies = "./cookies.txt"):
+        parser = argparse.ArgumentParser(prog = "SeleniumMaster")
+        parser.add_argument(
                 "--driver",
-                default = "/usr/bin/chromiumdriver",
-                type = "string",
+                default = driver,
+                type = str,
                 dest = "driver",
-                help = "chromiumdriver の場所"
+                help = "chromiumdriver の場所",
                 )
-        parser.add_option(
+        parser.add_argument(
                 "--browser",
-                default = "/usr/bin/chromium-browser",
-                type = "string",
+                default = browser,
+                type = str,
                 dest = "browser",
-                help = "chromium-browser の場所"
+                help = "chromium-browser の場所",
                 )
-        return parser.parse_args()
+        parser.add_argument(
+                "--cookies",
+                default = cookies,
+                type = str,
+                dest = "cookies",
+                help = "cookies ファイルの場所",
+                )
+        return parser.parse_known_args()
 
     # ブラウザを動かすためのクラスを作成する
-    def initSelenium(self, browser = "/usr/bin/chromium-browser", driver = "/usr/bin/chromiumdriver"):
+    def initSelenium(self):
         options = Options()
         if not self.ui:
             options.add_argument("--headless")
-        options.binary_location = browser
+        options.binary_location = self.browser_path
         self.driver = webdriver.Chrome(options = options)
 
     # url のページを開く
@@ -60,11 +76,11 @@ class Browser:
         time.sleep(delay)
 
     # URL で指定したサイトの HTML を全て読み込ませてから取得する
-    def getSoup(self, cookies = None):
+    def getSoup(self):
         # HTML ソースを取得
         html = self.driver.page_source
         # bs4 型に作成
-        soup = BeautifulSoup(html, "lxml", cookies = cookies)
+        soup = BeautifulSoup(html, "lxml")
         return soup
 
     def reload(self, num = "", ui = True):
@@ -75,4 +91,9 @@ class Browser:
 
     def close(self):
         self.driver.close()
+
+    def screenshot(self, path):
+        scroll_height = self.driver.execute_script("return document.body.scrollHeight")
+        self.driver.set_window_size(1920, scroll_height)
+        self.driver.save_screenshot(path)
 

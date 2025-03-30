@@ -9,8 +9,8 @@ readchar
 pyautogui
 phonetics
 gensim
-fuzzy
 scipy
 janome
 pynput
+pathlib
 

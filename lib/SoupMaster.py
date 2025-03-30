@@ -38,6 +38,11 @@ def get_soup(address, cookies = None, ui = False):
                 print("[open] " + address)
             soup = BeautifulSoup(data, "html.parser")
             return soup
+    except requests.exceptions.ConnectionError as rece:
+        if ui :
+            print("\x1b[31m" + address + " : Connection aborted!\r\nRemote Disconnected\r\nRemote end closed connection without response." + "\x1b[0m", file = sys.stderr)
+        time.sleep(5)
+        get_soup(address, ui)
     except (urllib.error.URLError, urllib.error.HTTPError) as e:
         if ui :
             print("\x1b[31m" + address + " : Time Out!" + "\x1b[0m", file = sys.stderr)
