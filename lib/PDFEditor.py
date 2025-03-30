@@ -11,6 +11,8 @@ import sys
 import SoupMaster as sm
 import PathEditor as pe
 import time
+from tqdm import tqdm
+from PrintMaster import Printer
 
 def dir2pdf(src_dir, pdf_path):
     with open(pdf_path, "wb") as f:
@@ -20,33 +22,38 @@ def dir2pdf(src_dir, pdf_path):
 def imgurllist2pdf(urls, path, sec = 1, ui = False):
     ret = 0
     imglist_pil = []
-    for url in urls:
+
+    config = {"name" : "PDFEditor", "sub-name" : "imgurllist2pdf", "screen-full" : True}
+    printer = Printer()
+    printer.addConfig(config)
+
+    for url in tqdm(urls, desc = "Convert"):
         if ui :
-            print(f"Img URL : {url}")
+            printer.print(f"Img URL : {url}")
         # PIL.Image 型の画像を URL から取得
         able, pil_image_raw = sm.download_image_for_pil(url, sec = sec, ui = ui)
         if able == 404 or able == 408:
-            print("\x1b[31m")
-            print(f"[PDFEditor] {ret} HTTP Error")
-            print(f"[PDFEditor] {ret} HTTP Error", file = sys.stderr)
-            print("\x1b[0m")
+            printer.print("\x1b[31m")
+            printer.print(f"[PDFEditor] {able} HTTP Error")
+            printer.print(f"[PDFEditor] {able} HTTP Error", file = sys.stderr)
+            printer.print("\x1b[0m")
         elif able == -1:
             if pe.isimage(url, ui = ui):
-                print("\x1b[31m")
-                print(f"[PDFEditor] {url} is not image.")
-                print(f"[PDFEditor] {url} is not image.", file = sys.stderr)
-                print("\x1b[0m")
+                printer.print("\x1b[31m")
+                printer.print(f"[PDFEditor] {url} is not image.")
+                printer.print(f"[PDFEditor] {url} is not image.", file = sys.stderr)
+                printer.print("\x1b[0m")
             else:
-                print("\x1b[31m")
-                print(f"[PDFEditor] {url} is image but unexcepted error.")
-                print(f"[PDFEditor] {url} is image but unexcepted error.", file = sys.stderr)
-                print("\x1b[0m")
+                printer.print("\x1b[31m")
+                printer.print(f"[PDFEditor] {url} is image but unexcepted error.")
+                printer.print(f"[PDFEditor] {url} is image but unexcepted error.", file = sys.stderr)
+                printer.print("\x1b[0m")
         else:
             pil_image = pil_image_raw.convert("RGBA")
             # PIL.Image をリストに追加する
+            imglist_pil.append(pil_image)
         if ret == 0:
             ret = able
-            imglist_pil.append(pil_image)
     if len(imglist_pil) > 0:
         imglist_pil[0].save(path, "PDF", quality = 100, save_all = True, append_images = imglist_pil[1:], optimize = True)
     return ret
