@@ -17,20 +17,20 @@ initSelenium()
 """
 
 class Browser:
-    def __init__(self, browser = "/usr/bin/chromium-browser", driver = "/usr/bin/chromiumdriver", ui = False):
+    def __init__(self, options = None, browser = "/usr/bin/chromium-browser", driver = "/usr/bin/chromiumdriver", ui = False):
         self.ui = ui
         self.args, _ = self.__getArgs(browser, driver)
         self.driver_path = self.args.driver
         self.browser_path = self.args.browser
         self.cookies = self.args.cookies
-        self.initSelenium()
+        self.initSelenium(options)
         if self.ui:
             self.printer = Printer()
             self.config = {
                     "name" : "Browser",
                     "screen-full" : True
                     }
-            self.printer.setConfig(self.config)
+            self.printer.addConfig(self.config)
 
     def __getArgs(self, browser = "/usr/bin/chromium-browser", driver = "/usr/bin/chromiumdriver", cookies = "./cookies.txt"):
         parser = argparse.ArgumentParser(prog = "SeleniumMaster")
@@ -58,8 +58,9 @@ class Browser:
         return parser.parse_known_args()
 
     # ブラウザを動かすためのクラスを作成する
-    def initSelenium(self):
-        options = Options()
+    def initSelenium(self, options = None):
+        if options is None:
+            options = Options()
         if not self.ui:
             options.add_argument("--headless")
         options.binary_location = self.browser_path
