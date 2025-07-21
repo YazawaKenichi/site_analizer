@@ -58,8 +58,8 @@ class KemonoPost:
         self.domain = url.domain
         self.url = url.basename
 
-    def update_soup(self):
-        self.soup = sm.get_soup(self.url, ui = False)
+    def update_soup(self, browser = "/usr/bin/browser", driver = "/usr/bin/driver"):
+        self.soup = sm.get_soup(self.url, on_browser = True, browser = browser, ui = False)
 
     def update_artist(self):
         class_ = "post__user-name"
@@ -141,8 +141,8 @@ class KemonoPage:
     def update_url(self, url):
         self.url = url
 
-    def update_soup(self):
-        self.soup = sm.get_soup(self.url, ui = False)
+    def update_soup(self, browser = "/usr/bin/browser", driver = "/usr/bin/driver"):
+        self.soup = sm.get_soup(self.url, on_browser = True, browser = browser, ui = False)
 
     def update_posts(self):
         articles = self.soup.find_all(class_ = "post-card")
@@ -203,8 +203,8 @@ class Kemono:
         if self.ui:
             self.printer.print(f"{self.url.address}", config = {"sub-name" : "update_url", "screen-full" : False})
 
-    def update_soup(self):
-        self.soup = sm.get_soup(self.url.basename, ui  = False)
+    def update_soup(self, browser = "/usr/bin/browser", driver = "/usr/bin/driver"):
+        self.soup = sm.get_soup(self.url.basename, on_browser = True, browser = browser, ui  = False)
         if self.ui:
             self.printer.print(f"{self.soup}", config = {"sub-name" : "update_soup", "screen-full" : False})
 

@@ -23,35 +23,40 @@ import numpy as np
 from PrintMaster import Printer
 
 # アドレスの BeautifulSoup を返す
-def get_soup(address, parser = "html.parser", cookies = None, ui = False):
+def get_soup(address, parser = "html.parser", cookies = None, on_browser = True, browser = "/usr/bin/browser", driver = "/usr/bin/driver", ui = False):
     config = {"name" : "SoupMaster", "sub-name" : "get_soup", "screen-full" : True}
     printer = Printer()
     printer.addConfig(config)
-    try:
-        # ユーザエージェントの偽装
-        user_agent = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.114 Safari/537.36'
-        headers = getHeaders()
-        # レスポンスの情報を管理するオブジェクトを返す
-        # このオブジェクトからメソッドを呼び出して必要な情報を取り出す
-        with requests.get(address, headers = headers, cookies = cookies) as response:
+    if on_browser:
+        browser = Browser(browser = browser, driver = driver)
+        browser.openUrl(addr)
+        return browser.getSoup()
+    else:
+        try:
+            # ユーザエージェントの偽装
+            user_agent = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.114 Safari/537.36'
+            headers = getHeaders()
+            # レスポンスの情報を管理するオブジェクトを返す
+            # このオブジェクトからメソッドを呼び出して必要な情報を取り出す
+            with requests.get(address, headers = headers, cookies = cookies) as response:
+                time.sleep(0.5)
+                # 取得した文字列をまとめて取り出す
+                body = response.content
+                data = body
+                if ui:
+                    printer.print("[open] " + address)
+                soup = BeautifulSoup(data, parser)
+                return soup
+        except requests.exceptions.ConnectionError as rece:
+            if ui :
+                print("\x1b[31m" + address + " : Connection aborted!\r\nRemote Disconnected\r\nRemote end closed connection without response." + "\x1b[0m", file = sys.stderr)
+            time.sleep(5)
+            get_soup(address, ui)
+        except (urllib.error.URLError, urllib.error.HTTPError) as e:
+            if ui :
+                printer.print("\x1b[31m" + address + " : Time Out!" + "\x1b[0m", file = sys.stderr)
             time.sleep(0.5)
-            # 取得した文字列をまとめて取り出す
-            body = response.content
-            data = body
-            if ui:
-                printer.print("[open] " + address)
-            soup = BeautifulSoup(data, parser)
-            return soup
-    except requests.exceptions.ConnectionError as rece:
-        if ui :
-            print("\x1b[31m" + address + " : Connection aborted!\r\nRemote Disconnected\r\nRemote end closed connection without response." + "\x1b[0m", file = sys.stderr)
-        time.sleep(5)
-        get_soup(address, ui)
-    except (urllib.error.URLError, urllib.error.HTTPError) as e:
-        if ui :
-            printer.print("\x1b[31m" + address + " : Time Out!" + "\x1b[0m", file = sys.stderr)
-        time.sleep(0.5)
-        get_soup(address, ui)
+            get_soup(address, ui)
 
 def list2soup(_list, ui = False):
     li = "".join(map(str, _list))
