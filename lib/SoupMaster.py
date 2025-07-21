@@ -21,6 +21,7 @@ import io
 import os
 import numpy as np
 from PrintMaster import Printer
+from SeleniumMaster import Browser
 
 # アドレスの BeautifulSoup を返す
 def get_soup(address, parser = "html.parser", cookies = None, on_browser = True, browser = "/usr/bin/browser", driver = "/usr/bin/driver", ui = False):
@@ -29,7 +30,7 @@ def get_soup(address, parser = "html.parser", cookies = None, on_browser = True,
     printer.addConfig(config)
     if on_browser:
         browser = Browser(browser = browser, driver = driver)
-        browser.openUrl(addr)
+        browser.openUrl(address)
         return browser.getSoup()
     else:
         try:

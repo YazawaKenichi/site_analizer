@@ -29,7 +29,7 @@ class KemonoPost:
     str{} comments
     """
 
-    def __init__(self, _url, ui = False):
+    def __init__(self, _url, browser = "/usr/bin/browser", driver = "/usr/bin/driver", ui = False):
         self.printer = Printer()
         config = { "name" : "KemonoPost", "screen-full" : True }
         self.printer.addConfig(config)
@@ -41,9 +41,11 @@ class KemonoPost:
         self.files = []
         self.comments = {}
         self.update_url(_url)
+        self.browser = browser
+        self.driver = driver
         if self.ui:
             self.printer.print(f"Address : {self.url}")
-        self.update_soup()
+        self.update_soup(self.browser, self.driver)
         self.update_artist()
         self.update_title()
         self.update_downloads()
@@ -59,7 +61,7 @@ class KemonoPost:
         self.url = url.basename
 
     def update_soup(self, browser = "/usr/bin/browser", driver = "/usr/bin/driver"):
-        self.soup = sm.get_soup(self.url, on_browser = True, browser = browser, ui = False)
+        self.soup = sm.get_soup(self.url, on_browser = True, browser = browser, driver = driver, ui = False)
 
     def update_artist(self):
         class_ = "post__user-name"
@@ -119,14 +121,19 @@ class KemonoPost:
 
     def update_comments(self):
         div = self.soup.find(class_ = "post__comments")
-        name_anchors = div.find_all("header", class_ = "fancy-link fancy-link--local comment__name")
-        message_anchors = div.find_all("p", class_ = "comment_message")
-        for index, name_anchor in enumerate(name_anchors):
-            self.comments[name_anchor.text] = message_anchors[index].text
+        if not div is None:
+            name_anchors = div.find_all("header", class_ = "fancy-link fancy-link--local comment__name")
+            message_anchors = div.find_all("p", class_ = "comment__message")
+            for index, name_anchor in enumerate(name_anchors):
+                self.comments[name_anchor.text] = message_anchors[index].text
+        else:
+            self.comments["--- No Comments ---"] = ""
 
 class KemonoPage:
     """ KemonoPage """
-    def __init__(self, url):
+    def __init__(self, url, browser = "/usr/bin/browser", driver = "/usr/bin/driver"):
+        self.browser = browser
+        self.driver = driver
         self.get(url)
 
     def get(self, url):
@@ -134,7 +141,7 @@ class KemonoPage:
         self.next = None
         self.posts = []
         self.update_url(url)
-        self.update_soup()
+        self.update_soup(self.browser, self.driver)
         self.update_posts()
         self.update_next()
 
@@ -142,7 +149,7 @@ class KemonoPage:
         self.url = url
 
     def update_soup(self, browser = "/usr/bin/browser", driver = "/usr/bin/driver"):
-        self.soup = sm.get_soup(self.url, on_browser = True, browser = browser, ui = False)
+        self.soup = sm.get_soup(self.url, on_browser = True, browser = browser, driver = driver, ui = False)
 
     def update_posts(self):
         articles = self.soup.find_all(class_ = "post-card")
@@ -155,8 +162,10 @@ class KemonoPage:
         self.posts.reverse()
 
     def update_next(self):
-        anchor = self.soup.find(class_ = "fancy-link fancy-link--kemono next")
-        if not anchor is None:
+        bolds = self.soup.find_all(lambda tag: tag.name == "b" and tag.string == ">")
+        anchor = bolds[0].parent
+        class_list = anchor.get("class", [])
+        if not "pagination-button-disabled" in class_list:
             self.next = self.domain + anchor["href"]
 
 class Kemono:
@@ -179,12 +188,14 @@ class Kemono:
         str{} comments
     """
 
-    def __init__(self, url, ui = False):
+    def __init__(self, url, browser = "/usr/bin/browser", driver = "/usr/bin/driver", ui = False):
         self.ui = ui
         self.detail = True
         self.printer = Printer()
         config = { "name" : "Kemono", "screen-full" : True }
         self.printer.addConfig(config)
+        self.browser = browser
+        self.driver = driver
         self.get(url)
 
     """ Get Bestchai Page """
@@ -192,7 +203,7 @@ class Kemono:
         self.posts = []
         self.pages = []
         self.update_url(url)
-        self.update_soup()
+        self.update_soup(self.browser, self.driver)
         self.update_meta()
         self.update_pages()
         self.update_posts()
@@ -204,9 +215,9 @@ class Kemono:
             self.printer.print(f"{self.url.address}", config = {"sub-name" : "update_url", "screen-full" : False})
 
     def update_soup(self, browser = "/usr/bin/browser", driver = "/usr/bin/driver"):
-        self.soup = sm.get_soup(self.url.basename, on_browser = True, browser = browser, ui  = False)
-        if self.ui:
-            self.printer.print(f"{self.soup}", config = {"sub-name" : "update_soup", "screen-full" : False})
+        self.soup = sm.get_soup(self.url.basename, on_browser = True, browser = browser, driver = driver, ui  = False)
+        # if self.ui:
+        #     self.printer.print(f"{self.soup}", config = {"sub-name" : "update_soup", "screen-full" : False})
 
     def update_meta(self):
         head = self.soup.find("head")
@@ -220,7 +231,7 @@ class Kemono:
         address = self.url.basename
         while exist_next:
             self.pages.append(address)
-            kemonopage = KemonoPage(address)
+            kemonopage = KemonoPage(address, browser = self.browser, driver = self.driver)
             address = kemonopage.next
             if address is None:
                 exist_next = False
@@ -232,9 +243,9 @@ class Kemono:
     def update_posts(self):
         post_urls = []
         for page in self.pages:
-            kemonopage = KemonoPage(page)
+            kemonopage = KemonoPage(page, browser = self.browser, driver = self.driver)
             post_urls = extend(post_urls, kemonopage.posts)
         for post_url in post_urls:
-            kemonopost = KemonoPost(post_url, ui = self.ui)
+            kemonopost = KemonoPost(post_url, browser = self.browser, driver = self.driver, ui = self.ui)
             self.posts.append(kemonopost)
 

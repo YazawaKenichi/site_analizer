@@ -17,12 +17,11 @@ initSelenium()
 """
 
 class Browser:
-    def __init__(self, options = None, browser = "/usr/bin/chromium-browser", driver = "/usr/bin/chromiumdriver", ui = False):
+    def __init__(self, options = None, browser = "/usr/bin/chromium-browser", driver = "/usr/bin/chromiumdriver", cookies = "./cookies.txt", ui = False):
         self.ui = ui
-        self.args, _ = self.__getArgs(browser, driver)
-        self.driver_path = self.args.driver
-        self.browser_path = self.args.browser
-        self.cookies = self.args.cookies
+        self.browser_path = browser
+        self.driver_path = driver
+        self.cookies = cookies
         self.initSelenium(options)
         if self.ui:
             self.printer = Printer()
@@ -32,38 +31,13 @@ class Browser:
                     }
             self.printer.addConfig(self.config)
 
-    def __getArgs(self, browser = "/usr/bin/chromium-browser", driver = "/usr/bin/chromiumdriver", cookies = "./cookies.txt"):
-        parser = argparse.ArgumentParser(prog = "SeleniumMaster")
-        parser.add_argument(
-                "--driver",
-                default = driver,
-                type = str,
-                dest = "driver",
-                help = "chromiumdriver の場所",
-                )
-        parser.add_argument(
-                "--browser",
-                default = browser,
-                type = str,
-                dest = "browser",
-                help = "chromium-browser の場所",
-                )
-        parser.add_argument(
-                "--cookies",
-                default = cookies,
-                type = str,
-                dest = "cookies",
-                help = "cookies ファイルの場所",
-                )
-        return parser.parse_known_args()
-
     # ブラウザを動かすためのクラスを作成する
     def initSelenium(self, options = None):
         if options is None:
             options = Options()
         if not self.ui:
             options.add_argument("--headless")
-        options.binary_location = self.browser_path
+        options.binary_location = self.driver_path
         self.driver = webdriver.Chrome(options = options)
 
     # url のページを開く
