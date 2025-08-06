@@ -15,8 +15,6 @@ def file2list(filename, additional = []):
             lines = []
             for line in f:
                 line = line.replace("\n", "")
-                line = line.replace(" ", "")
-                line = line.split("#")[0]
                 if not line == "":
                     lines.append(line)
         r_lines = list(dict.fromkeys(lines))
@@ -50,7 +48,7 @@ def dirname(path):
 
 # ディレクトリ作成
 def mkdir(path, ui = False):
-    _dirname = dirname(path)
+    _dirname = os.path.abspath(dirname(path))
     if not os.path.exists(_dirname):
         if True:
             os.makedirs(_dirname)
