@@ -7,8 +7,11 @@ import time
 from bs4 import BeautifulSoup
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.support.ui import WebDriverWait
 from PrintMaster import Printer
 import argparse
+import os, uuid
 
 """
 from SeleniumMaster import Browser
@@ -33,12 +36,36 @@ class Browser:
 
     # ブラウザを動かすためのクラスを作成する
     def initSelenium(self, options = None):
-        if options is None:
-            options = Options()
+        import tempfile, shutil, atexit
+
+        chrome_opts = Options()
+        _tmp_profile = tempfile.mkdtemp(prefix = "selenium-profile-")
+        chrome_opts.add_argument(f"--user-data-dir={_tmp_profile}")
+        chrome_opts.add_argument("--no-first-run")
+        chrome_opts.add_argument("--no-default-browser-check")
+        chrome_opts.add_argument("--disable-background-networking")
+        chrome_opts.add_argument("--disable-dev-shm-usage")
+        chrome_opts.add_argument("--no-sandbox")
+        chrome_opts.add_argument("--remote-debugging-port=0")
+
+        if isinstance(options, dict):
+            chrome_opts.add_experimental_option("prefs", options)
+
         if not self.ui:
-            options.add_argument("--headless")
-        options.binary_location = self.driver_path
-        self.driver = webdriver.Chrome(options = options)
+            chrome_opts.add_argument("--headless=new")
+
+        def _cleanup():
+            try:
+                shutil.rmtree(_tmp_profile, ignore_errors = True)
+            except Exception:
+                pass
+        atexit.register(_cleanup)
+
+        chrome_opts.binary_location = self.browser_path
+
+        service = Service(executable_path = self.driver_path)
+        self.driver = webdriver.Chrome(service = service, options = chrome_opts)
+        self.wait = WebDriverWait(self.driver, 30)
 
     # url のページを開く
     def openUrl(self, url, delay = 10):
@@ -65,7 +92,14 @@ class Browser:
             self.printer.print("refresh")
 
     def close(self):
-        self.driver.close()
+        try:
+            self.driver.quit()
+        finally:
+            try:
+                if hasattr(self, "_tmp_profile"):
+                    shutil.rmtree(self._tmp_profile, ignore_errors = True)
+            except Exception:
+                pass
 
     def screenshot(self, path):
         scroll_height = self.driver.execute_script("return document.body.scrollHeight")
