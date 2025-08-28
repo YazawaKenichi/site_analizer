@@ -24,7 +24,7 @@ from PrintMaster import Printer
 from SeleniumMaster import Browser
 
 # アドレスの BeautifulSoup を返す
-def get_soup(address, parser = "html.parser", cookies = None, on_browser = True, browser = "/usr/bin/browser", driver = "/usr/bin/driver", ui = False):
+def get_soup(address, parser = "html.parser", cookies = None, on_browser = False, browser = "/usr/bin/browser", driver = "/usr/bin/driver", ui = False):
     config = {"name" : "SoupMaster", "sub-name" : "get_soup", "screen-full" : True}
     printer = Printer()
     printer.addConfig(config)
