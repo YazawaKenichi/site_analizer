@@ -20,12 +20,13 @@ initSelenium()
 """
 
 class Browser:
-    def __init__(self, options = None, browser = "/usr/bin/chromium-browser", driver = "/usr/bin/chromiumdriver", cookies = "./cookies.txt", ui = False):
+    def __init__(self, options = None, browser = "/usr/bin/chromium-browser", driver = "/usr/bin/chromiumdriver", cookies = "./cookies.txt", headless = False, limit = 30, ui = False):
         self.ui = ui
+        self.headless = headless
         self.browser_path = browser
         self.driver_path = driver
         self.cookies = cookies
-        self.initSelenium(options)
+        self.initSelenium(options, limit = limit)
         if self.ui:
             self.printer = Printer()
             self.config = {
@@ -35,7 +36,7 @@ class Browser:
             self.printer.addConfig(self.config)
 
     # ブラウザを動かすためのクラスを作成する
-    def initSelenium(self, options = None):
+    def initSelenium(self, options = None, limit = 30):
         import tempfile, shutil, atexit
 
         chrome_opts = Options()
@@ -51,7 +52,7 @@ class Browser:
         if isinstance(options, dict):
             chrome_opts.add_experimental_option("prefs", options)
 
-        if not self.ui:
+        if self.headless:
             chrome_opts.add_argument("--headless=new")
 
         def _cleanup():
@@ -65,7 +66,7 @@ class Browser:
 
         service = Service(executable_path = self.driver_path)
         self.driver = webdriver.Chrome(service = service, options = chrome_opts)
-        self.wait = WebDriverWait(self.driver, 30)
+        self.wait = WebDriverWait(self.driver, limit)
 
     # url のページを開く
     def openUrl(self, url, delay = 10):
