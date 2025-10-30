@@ -31,7 +31,9 @@ def get_soup(address, parser = "html.parser", cookies = None, on_browser = False
     if on_browser:
         browser = Browser(browser = browser, driver = driver)
         browser.openUrl(address)
-        return browser.getSoup()
+        soup = browser.getSoup()
+        browser.close()
+        return soup
     else:
         try:
             # ユーザエージェントの偽装
