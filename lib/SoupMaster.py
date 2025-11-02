@@ -24,12 +24,12 @@ from PrintMaster import Printer
 from SeleniumMaster import Browser
 
 # アドレスの BeautifulSoup を返す
-def get_soup(address, parser = "html.parser", cookies = None, on_browser = False, browser = "/usr/bin/browser", driver = "/usr/bin/driver", ui = False):
+def get_soup(address, parser = "html.parser", cookies = None, on_browser = False, browser = "/usr/bin/browser", driver = "/usr/bin/driver", headless = True, ui = False):
     config = {"name" : "SoupMaster", "sub-name" : "get_soup", "screen-full" : True}
     printer = Printer()
     printer.addConfig(config)
     if on_browser:
-        browser = Browser(browser = browser, driver = driver)
+        browser = Browser(browser = browser, driver = driver, headless = headless)
         browser.openUrl(address)
         soup = browser.getSoup()
         browser.close()

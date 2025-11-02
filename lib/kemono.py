@@ -7,6 +7,7 @@ import SoupMaster as sm
 import FDEditor as fde
 import os
 from urllib import parse
+import traceback
 
 def extend(lista, listb):
     ret = []
@@ -29,11 +30,12 @@ class KemonoPost:
     str{} comments
     """
 
-    def __init__(self, _url, browser = "/usr/bin/browser", driver = "/usr/bin/driver", ui = False):
+    def __init__(self, _url, browser = "/usr/bin/browser", driver = "/usr/bin/driver", headless = True, ui = False):
         self.printer = Printer()
         config = { "name" : "KemonoPost", "screen-full" : True }
         self.printer.addConfig(config)
         self.ui = ui
+        self.headless = headless
         self.title = ""
         self.downloads = []
         self.content = ""
@@ -61,21 +63,14 @@ class KemonoPost:
         self.url = url.basename
 
     def update_soup(self, browser = "/usr/bin/browser", driver = "/usr/bin/driver"):
-        self.soup = sm.get_soup(self.url, on_browser = True, browser = browser, driver = driver, ui = False)
+        if self.ui:
+            self.printer.print(f"{self.url}", {"sub-name": "update_soup"})
+        self.soup = sm.get_soup(self.url, on_browser = True, browser = browser, driver = driver, headless = self.headless, ui = self.ui)
 
     def update_artist(self):
         class_ = "post__user-name"
         a = self.soup.find("a", class_ = class_)
-        try:
-            self.artist = a.text.replace("\n", "").replace("\r", "").replace(" ", "")
-        except AttributeError:
-            import sys
-            print("URL")
-            print(self.url)
-            print("AttributeError")
-            print(self.soup)
-            fde.create_file("./errorpage.html", self.soup)
-            sys.exit(0)
+        self.artist = a.text.replace("\n", "").replace("\r", "").replace(" ", "")
 
     def update_title(self):
         h1 = self.soup.find("h1", class_ = "post__title")
@@ -131,7 +126,12 @@ class KemonoPost:
 
 class KemonoPage:
     """ KemonoPage """
-    def __init__(self, url, browser = "/usr/bin/browser", driver = "/usr/bin/driver"):
+    def __init__(self, url, browser = "/usr/bin/browser", driver = "/usr/bin/driver", headless = True, ui = False):
+        self.ui = ui
+        self.printer = Printer()
+        config = { "name" : "KemonoPage", "screen-full" : True }
+        self.printer.addConfig(config)
+        self.headless = headless
         self.browser = browser
         self.driver = driver
         self.get(url)
@@ -149,7 +149,9 @@ class KemonoPage:
         self.url = url
 
     def update_soup(self, browser = "/usr/bin/browser", driver = "/usr/bin/driver"):
-        self.soup = sm.get_soup(self.url, on_browser = True, browser = browser, driver = driver, ui = False)
+        if self.ui:
+            self.printer.print(f"{self.url}", {"sub-name": "update_soup"})
+        self.soup = sm.get_soup(self.url, on_browser = True, browser = browser, driver = driver, headless = self.headless, ui = self.ui)
 
     def update_posts(self):
         articles = self.soup.find_all(class_ = "post-card")
@@ -188,8 +190,9 @@ class Kemono:
         str{} comments
     """
 
-    def __init__(self, url, browser = "/usr/bin/browser", driver = "/usr/bin/driver", ui = False):
+    def __init__(self, url, browser = "/usr/bin/browser", driver = "/usr/bin/driver", headless = True, ui = False):
         self.ui = ui
+        self.headless = headless
         self.detail = True
         self.printer = Printer()
         config = { "name" : "Kemono", "screen-full" : True }
@@ -202,9 +205,12 @@ class Kemono:
     def get(self, url):
         self.posts = []
         self.pages = []
+        self.attribute_error_urls = []
         self.update_url(url)
-        self.update_soup(self.browser, self.driver)
-        self.update_meta()
+        yet = 1
+        while yet:
+            self.update_soup(self.browser, self.driver)
+            yet = self.update_meta()
         self.update_pages()
         self.update_posts()
 
@@ -215,23 +221,44 @@ class Kemono:
             self.printer.print(f"{self.url.address}", config = {"sub-name" : "update_url", "screen-full" : False})
 
     def update_soup(self, browser = "/usr/bin/browser", driver = "/usr/bin/driver"):
-        self.soup = sm.get_soup(self.url.basename, on_browser = True, browser = browser, driver = driver, ui  = False)
+        if self.ui:
+            self.printer.print(f"{self.url.basename}", {"sub-name": "update_soup"})
+        self.soup = sm.get_soup(self.url.basename, on_browser = True, browser = browser, driver = driver, ui  = self.headless)
         # if self.ui:
         #     self.printer.print(f"{self.soup}", config = {"sub-name" : "update_soup", "screen-full" : False})
 
     def update_meta(self):
         head = self.soup.find("head")
         metas = head.find_all("meta")
-        self.id = metas[2]["content"]
-        self.service = metas[3]["content"]
-        self.artist = metas[4]["content"]
+        self.artist = None
+        self.id = None
+        self.service = None
+        for meta in metas:
+            try:
+                meta_name = meta["name"]
+                if ("artist_name" in meta_name):
+                    self.artist = meta["content"]
+                if ("id" in meta_name):
+                    self.id = meta["content"]
+                if ("service" in meta_name):
+                    self.service = meta["content"]
+            except KeyError as e:
+                _ = 0
+        if (not self.artist) or (not self.id) or (not self.service):
+            self.printer.print(f"想定外の HTML ソースを取得したため再試行します: {self.url}", config = {"sub-name" : "update_posts", "screen-full" : True})
+            return 1
+        if self.ui:
+            self.printer.print(f"Artist : {self.artist}", config = {"sub-name": "update_meta"})
+            self.printer.print(f"Service : {self.service}", config = {"sub-name": "update_meta"})
+            self.printer.print(f"ID : {self.id}", config = {"sub-name": "update_meta"})
+        return 0
 
     def update_pages(self):
         exist_next = True
         address = self.url.basename
         while exist_next:
             self.pages.append(address)
-            kemonopage = KemonoPage(address, browser = self.browser, driver = self.driver)
+            kemonopage = KemonoPage(address, browser = self.browser, driver = self.driver, headless = self.headless, ui = self.ui)
             address = kemonopage.next
             if address is None:
                 exist_next = False
@@ -243,9 +270,14 @@ class Kemono:
     def update_posts(self):
         post_urls = []
         for page in self.pages:
-            kemonopage = KemonoPage(page, browser = self.browser, driver = self.driver)
+            kemonopage = KemonoPage(page, browser = self.browser, driver = self.driver, headless = self.headless, ui = self.ui)
             post_urls = extend(post_urls, kemonopage.posts)
         for post_url in post_urls:
-            kemonopost = KemonoPost(post_url, browser = self.browser, driver = self.driver, ui = self.ui)
-            self.posts.append(kemonopost)
+            try:
+                kemonopost = KemonoPost(post_url, browser = self.browser, driver = self.driver, headless = self.headless, ui = self.ui)
+                self.posts.append(kemonopost)
+            except AttributeError as e:
+                traceback.print_exc()
+                self.printer.print(f"想定外の HTML ソースを取得したためスキップします: {post_url}", config = {"sub-name" : "update_posts", "screen-full" : True})
+                self.attribute_error_urls.append(post_url)
 
