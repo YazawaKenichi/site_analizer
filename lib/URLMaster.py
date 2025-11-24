@@ -22,8 +22,9 @@ class URL:
     "https://www.example.com" = url.domain
     """
 
-    def __init__(self, url):
+    def __init__(self, url, verbose = False):
         self.get(url)
+        self.verbose = verbose
 
     def get(self, url):
         self.update_address(url)
@@ -37,7 +38,8 @@ class URL:
             self.update_basename()
             self.update_domain()
         else:
-            print(f"[URLMaster][isURL] Invalied URL : {url}")
+            if self.verbose:
+                print(f"[URLMaster][isURL] Invalied URL : {url}")
 
     def update_address(self, url):
         self.address = unquote(url)
@@ -65,9 +67,10 @@ class URL:
             param_string = self.address.split("?")[1].split("#")[0]
             params = param_string.split("&")
             for param in params:
-                key = param.split("=")[0]
-                val = param.split("=")[1]
-                _dict[key] = val
+                if "=" in param:
+                    key = param.split("=")[0]
+                    val = param.split("=")[1]
+                    _dict[key] = val
         self.param = _dict
 
     def update_flag(self):
