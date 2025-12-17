@@ -47,7 +47,7 @@ def path_short(path, namelength = NAMELENGTH, ui = False):
 
 # 指定文字列が画像を示すかどうかを返す
 def isimage(path, ui = False):
-    imageexies = [".jpg", ".jpeg", ".png", ".ping", ".webp", ".jfif", ".svg", ".pgm", ".jpg_large", ".ico"]
+    imageexies = [".jpg", ".jpeg", ".png", ".ping", ".webp", ".jfif", ".svg", ".pgm", ".jpg_large", ".ico", ".avif"]
     ext = get_ext(path, ui = False)
     if ui:
         msg = f"[compare] path : {path} | ext : {ext} | {ext in imageexies}"
