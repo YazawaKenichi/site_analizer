@@ -23,8 +23,8 @@ class URL:
     """
 
     def __init__(self, url, verbose = False):
-        self.get(url)
         self.verbose = verbose
+        self.get(url)
 
     def get(self, url):
         self.update_address(url)

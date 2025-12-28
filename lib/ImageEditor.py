@@ -19,9 +19,17 @@ def convertor(src_path, build_path, ui = False):
         # 画像のときは画像変換
         if ui :
             print("[converting] " + src_path)
-        cv2.imwrite(build_path, cv2.imread(src_path))
+        img = cv2.imread(src_path, cv2.IMREAD_UNCHANGED)
+        if img is None:
+            if ui:
+                print("[skip] " + src_path + " could not be read.")
+                return
+        ok = cv2.imwrite(build_path, img)
         if ui :
-            print("[converted] " + build_path)
+            if ok:
+                print("[converted] " + build_path)
+            else:
+                print("[error] failed to write: " + build_path)
     else:
         # 画像ではないときはスキップ
         if ui :
