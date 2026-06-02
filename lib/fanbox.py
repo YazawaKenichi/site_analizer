@@ -30,8 +30,10 @@ class FanboxPost:
             raise TypeError(f"browser must be Browser or str, got {type(browser)}")
 
         self.update_url(_url)
-        self.browser.openUrl(self.url, delay = 0.2)
+        self.browser.openUrl(self.url, delay = 5)
+        self.browser.wait.until( lambda d: "Dummy__DummyPostTitle" not in d.page_source and "Dummy__DummyText" not in d.page_source )
         self.update_userid()
+        # input(" 一時停止 ")
 
         self.update_soup()
         self.update_username()
@@ -40,14 +42,14 @@ class FanboxPost:
         self.update_srcs()
 
         if self.verbose:
-            self.printer.print(f"URL : {self.domain}, UserName : {self.username}", config = { "screen-full" : False })
+            self.printer.print(f"URL : {self.domain}, UserName : {self.username}", config = { "screen-full" : False, "sub-name" : "init" })
 
     def update_url(self, _url):
         url = URL(_url)
         self.domain = url.domain
         self.url = url.basename
         if self.verbose:
-            self.printer.print(f"Address : {self.url}")
+            self.printer.print(f"Address : {self.url}", config = { "sub-name" : "update_url" })
 
     def update_userid(self):
         if URL(self.url).fqdn.split(".")[0] == "www":
@@ -57,7 +59,7 @@ class FanboxPost:
 
     def update_soup(self, browser = "/usr/bin/browser", driver = "/usr/bin/driver"):
         if self.verbose:
-            self.printer.print(f"{self.url}", {"sub-name": "update_soup"})
+            self.printer.print(f"{self.url}", config = {"sub-name": "update_soup"})
         self.soup = self.browser.getSoup()
 
     def update_username(self):
@@ -66,12 +68,13 @@ class FanboxPost:
         if a:
             self.username = a[0].text.strip()
         else:
-            self.printer.print("class \"UserNameText\" is None")
+            self.printer.print("class \"UserNameText\" is None", config = { "sub-name" : "update_username" } )
 
     def update_title(self):
         class_ = "PostTitle"
         h1 = sm.find_all_class_contains(self.soup, "h1", class_)
-        self.printer.print(f"{h1}", config = {"sub-name" : "update_title", "screen-full" : False})
+        self.title = h1.text.strip()
+        self.printer.print(f"{self.title}", config = {"sub-name" : "update_title", "screen-full" : False})
 
     def update_srcs(self):
         class_ = "PostImage__Wrapper"
@@ -87,10 +90,10 @@ class FanboxPost:
 
 ##### User Page #####
 class FanboxUser:
-    def __init__(self, _url, cookies = None, browser = None, driver = None, headless = False, limit = 60, profile = None, port = 9222, verbose = False):
+    def __init__(self, _url, cookies = None, browser = None, driver = None, headless = False, limit = 60, profile = None, port = None, verbose = False):
         self.verbose = verbose
         self.printer = Printer()
-        config = { "name" : "FanboxUser", "screen-full" : True , "enable" : self.verbose}
+        config = { "name" : "FanboxUser", "screen-full" : True , "enable" : False}
         self.printer.addConfig(config)
 
         self.username = ""
@@ -105,14 +108,15 @@ class FanboxUser:
             raise TypeError(f"browser must be Browser or str, got {type(browser)}")
 
         self.update_url(_url)
-        self.browser.openUrl(self.url, delay = 0.2)
+        self.browser.openUrl(self.url, delay = 5)
+        self.browser.driver.maximize_window()
         self.update_userid()
 
         self.update_soup()
         self.update_username()
         self.update_posts()
         if self.verbose:
-            self.printer.print(f"URL : {self.domain}, UserName : {self.username}", config = { "screen-full" : False })
+            self.printer.print(f"URL : {self.domain}, UserName : {self.username}, Posts : {len(self.posturls)}", config = { "sub-name" : "init", "screen-full" : False })
         import FDEditor as fde
         fde.create_file("fanbox.html", str(self.soup))
 
@@ -121,7 +125,7 @@ class FanboxUser:
         self.domain = url.domain
         self.url = url.basename
         if self.verbose:
-            self.printer.print(f"Address : {self.url}")
+            self.printer.print(f"Address : {self.url}", config = {"sub-name":"update_url"})
 
     def update_userid(self):
         if URL(self.url).fqdn.split(".")[0] == "www":
@@ -131,7 +135,7 @@ class FanboxUser:
 
     def update_soup(self, browser = "/usr/bin/browser", driver = "/usr/bin/driver"):
         if self.verbose:
-            self.printer.print(f"{self.url}", {"sub-name": "update_soup"})
+            self.printer.print(f"{self.url}", config = {"sub-name": "update_soup"})
         self.soup = self.browser.getSoup()
 
     def update_username(self):
@@ -150,19 +154,28 @@ class FanboxUser:
             new = 0
             posts_tab = parse.urljoin(self.domain, f"{self.userid}/posts") + "?sort=oldest" + f"&page={page}"
             # ページを開く
-            self.browser.openUrl(posts_tab, delay = 0.2)
+            self.browser.openUrl(posts_tab, delay = 5)
             soup = self.browser.getSoup()
+
             # 投稿一つ一つの URL を取得
+            class_ = "CreatorPostList__InnerWrapper"
+            div = sm.find_all_class_contains(soup, "div", class_)[0]
+            as_ = div.find_all("a")
+
+            # 横長限定のクラス
             class_ = "CardPostItem__Wrapper"
             as_ = sm.find_all_class_contains(soup, "a", class_)
             for a in as_:
+                # self.printer.print(f"{a}", config = { "sub-name" : "update_posts", "screen-full" : False } )
                 posturl = parse.urljoin(self.domain, a["href"])
                 if not posturl in self.posturls:
                     new += 1
                     self.posturls.append(posturl)
-                    self.printer.print(f"{posturl}")
+                    self.printer.print(f"{posturl}", config = { "sub-name" : "update_posts" } )
             if new == 0:
                 end = True
             page += 1
+
+            # DEBUG 用
             end = True
 

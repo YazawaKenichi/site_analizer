@@ -21,7 +21,7 @@ initSelenium()
 """
 
 class Browser:
-    def __init__(self, options = None, browser = "/usr/bin/chromium-browser", driver = "/usr/bin/chromiumdriver", cookies = "./cookies.txt", headless = False, limit = 30, profile = None, port = 9222, verbose = False):
+    def __init__(self, options = None, browser = "/usr/bin/chromium-browser", driver = "/usr/bin/chromiumdriver", cookies = None, headless = False, limit = 30, profile = None, port = 9222, verbose = False):
         self.verbose = verbose
         self.headless = headless
         self.browser_path = browser
@@ -40,15 +40,19 @@ class Browser:
             self.printer.addConfig(self.config)
 
     # ブラウザを動かすためのクラスを作成する
-    def initSelenium(self, options = None, limit = 30, port = 9222):
+    def initSelenium(self, options = None, limit = 30, port = None):
         import tempfile, shutil, atexit
 
         chrome_opts = Options()
 
+        def _cleanup():
+            try:
+                shutil.rmtree(_tmp_profile, ignore_errors = True)
+            except Exception:
+                pass
+
         if self.profile is None:
             _tmp_profile = tempfile.mkdtemp(prefix = "selenium-profile-")
-            def _cleanup():
-                shutil.rmtree(_tmp_profile, ignore_errors = True)
             atexit.register(_cleanup)
         else:
             _tmp_profile = os.path.abspath(self.profile)
@@ -65,8 +69,9 @@ class Browser:
         chrome_opts.add_experimental_option("excludeSwitches", ["enable-automation"])
         chrome_opts.add_experimental_option("useAutomationExtension", False)
 
-        # chrome_opts = Options()
-        # chrome_opts.debugger_address = f"127.0.0.1:{port}"
+        if not port is None:
+            chrome_opts = Options()
+            chrome_opts.debugger_address = f"127.0.0.1:{port}"
 
         if isinstance(options, dict):
             chrome_opts.add_experimental_option("prefs", options)
@@ -74,11 +79,6 @@ class Browser:
         if self.headless:
             chrome_opts.add_argument("--headless=new")
 
-        def _cleanup():
-            try:
-                shutil.rmtree(_tmp_profile, ignore_errors = True)
-            except Exception:
-                pass
         atexit.register(_cleanup)
 
         chrome_opts.binary_location = self.browser_path
@@ -112,7 +112,7 @@ class Browser:
         self.driver.refresh()
 
     # url のページを開く
-    def openUrl(self, url, delay = 10):
+    def openUrl(self, url, delay = None):
         if self.verbose:
             self.config["sub-name"] = "open"
             self.printer.print(url, config = self.config)
@@ -123,6 +123,8 @@ class Browser:
             self.cookies_loaded = True
         # ブラウザでページが開ききるのを待つ
         self.wait.until( lambda d: d.execute_script("return document.readyState") == "complete" )
+        if delay:
+            time.sleep(delay)
 
     # URL で指定したサイトの HTML を全て読み込ませてから取得する
     def getSoup(self):
