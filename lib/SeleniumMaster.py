@@ -12,6 +12,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from PrintMaster import Printer
 import argparse
 import os, uuid
+import http.cookiejar
 
 """
 from SeleniumMaster import Browser
@@ -20,14 +21,17 @@ initSelenium()
 """
 
 class Browser:
-    def __init__(self, options = None, browser = "/usr/bin/chromium-browser", driver = "/usr/bin/chromiumdriver", cookies = "./cookies.txt", headless = False, limit = 30, ui = False):
-        self.ui = ui
+    def __init__(self, options = None, browser = "/usr/bin/chromium-browser", driver = "/usr/bin/chromiumdriver", cookies = "./cookies.txt", headless = False, limit = 30, profile = None, port = 9222, verbose = False):
+        self.verbose = verbose
         self.headless = headless
         self.browser_path = browser
         self.driver_path = driver
         self.cookies = cookies
-        self.initSelenium(options, limit = limit)
-        if self.ui:
+        self.cookies_loaded = False
+        self.profile = profile
+        self.port = port
+        self.initSelenium(options, limit = limit, port = port)
+        if self.verbose:
             self.printer = Printer()
             self.config = {
                     "name" : "Browser",
@@ -36,18 +40,33 @@ class Browser:
             self.printer.addConfig(self.config)
 
     # ブラウザを動かすためのクラスを作成する
-    def initSelenium(self, options = None, limit = 30):
+    def initSelenium(self, options = None, limit = 30, port = 9222):
         import tempfile, shutil, atexit
 
         chrome_opts = Options()
-        _tmp_profile = tempfile.mkdtemp(prefix = "selenium-profile-")
+
+        if self.profile is None:
+            _tmp_profile = tempfile.mkdtemp(prefix = "selenium-profile-")
+            def _cleanup():
+                shutil.rmtree(_tmp_profile, ignore_errors = True)
+            atexit.register(_cleanup)
+        else:
+            _tmp_profile = os.path.abspath(self.profile)
+            chrome_opts.add_argument("--profile-directory=Default")
         chrome_opts.add_argument(f"--user-data-dir={_tmp_profile}")
         chrome_opts.add_argument("--no-first-run")
         chrome_opts.add_argument("--no-default-browser-check")
-        chrome_opts.add_argument("--disable-background-networking")
         chrome_opts.add_argument("--disable-dev-shm-usage")
         chrome_opts.add_argument("--no-sandbox")
         chrome_opts.add_argument("--remote-debugging-port=0")
+
+        # chrome_opts.add_argument("--disable-background-networking")
+        chrome_opts.add_argument("--disable-blink-features=AutomationControlled")
+        chrome_opts.add_experimental_option("excludeSwitches", ["enable-automation"])
+        chrome_opts.add_experimental_option("useAutomationExtension", False)
+
+        # chrome_opts = Options()
+        # chrome_opts.debugger_address = f"127.0.0.1:{port}"
 
         if isinstance(options, dict):
             chrome_opts.add_experimental_option("prefs", options)
@@ -68,15 +87,42 @@ class Browser:
         self.driver = webdriver.Chrome(service = service, options = chrome_opts)
         self.wait = WebDriverWait(self.driver, limit)
 
+    def loadCookies(self, url = None):
+        if not self.cookies:
+            return
+        jar = http.cookiejar.MozillaCookieJar(self.cookies)
+        jar.load(ignore_discard = True, ignore_expires = True)
+        if not url is None:
+            self.driver.get(url)
+        for c in jar:
+            cookie = {
+                    "name" : c. name,
+                    "value" : c.value, 
+                    "path" : c.path,
+                    }
+            if c.domain:
+                cookie["domain"] = c.domain
+            if c.expires:
+                cookie["expiry"] = c.expires
+            try:
+                self.driver.add_cookie(cookie)
+            except Exception as e:
+                if self.verbose:
+                    self.printer.print(f"cookie skip: {c.name}: {e}", config = {"enable" : False})
+        self.driver.refresh()
+
     # url のページを開く
     def openUrl(self, url, delay = 10):
-        if self.ui:
+        if self.verbose:
             self.config["sub-name"] = "open"
-            self.printer.print(url)
+            self.printer.print(url, config = self.config)
         # ブラウザでページを開く
         self.driver.get(url)
+        if self.cookies and not self.cookies_loaded:
+            self.loadCookies()
+            self.cookies_loaded = True
         # ブラウザでページが開ききるのを待つ
-        time.sleep(delay)
+        self.wait.until( lambda d: d.execute_script("return document.readyState") == "complete" )
 
     # URL で指定したサイトの HTML を全て読み込ませてから取得する
     def getSoup(self):
@@ -86,11 +132,11 @@ class Browser:
         soup = BeautifulSoup(html, "lxml")
         return soup
 
-    def reload(self, num = "", ui = True):
+    def reload(self, num = "", verbose = True):
         self.driver.refresh()
-        if self.ui:
+        if self.verbose:
             self.config["sub-name"] = "reload"
-            self.printer.print("refresh")
+            self.printer.print("refresh", config = self.config)
 
     def close(self):
         try:

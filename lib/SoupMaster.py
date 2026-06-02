@@ -24,7 +24,7 @@ from PrintMaster import Printer
 from SeleniumMaster import Browser
 
 # アドレスの BeautifulSoup を返す
-def get_soup(address, parser = "html.parser", cookies = None, on_browser = False, browser = "/usr/bin/browser", driver = "/usr/bin/driver", headless = True, ui = False):
+def get_soup(address, parser = "html.parser", cookies = None, on_browser = False, browser = "/usr/bin/browser", driver = "/usr/bin/driver", headless = True, verbose = False):
     config = {"name" : "SoupMaster", "sub-name" : "get_soup", "screen-full" : True}
     printer = Printer()
     printer.addConfig(config)
@@ -61,12 +61,12 @@ def get_soup(address, parser = "html.parser", cookies = None, on_browser = False
             time.sleep(0.5)
             get_soup(address, ui)
 
-def list2soup(_list, ui = False):
+def list2soup(_list, verbose = False):
     li = "".join(map(str, _list))
     soup = BeautifulSoup(li, "html.parser")
     return soup
 
-def str2soup(string, ui = False):
+def str2soup(string, verbose = False):
     soup = BeautifulSoup(str(string), "html.parser")
     return soup
 
@@ -79,22 +79,27 @@ def print_element(elem):
     else:
         printer.print(type(elem), elem.name)
 
+# <TAG, class = ".*class_.*"> の要素を探索（クラスの部分一致を検索）
+def find_all_class_contains(soup, tag, class_):
+    import re
+    return soup.find_all(tag, class_ = re.compile(class_))
+
 def get_tags(soup, tag = "div"):
     list_ = soup.find_all(tag)
     return list_
 
 # 特定クラス名を持つタグの要素を取得
-def get_tags_from_class(soup, class_, tag = "div", ui = False):
+def get_tags_from_class(soup, class_, tag = "div", verbose = False):
     lists = soup.find_all(tag, class_ = class_)
     return lists
 
 # 特定の ID 名を持つタグの要素を取得
-def get_tags_from_id(soup, id, tag = "div", ui = False):
+def get_tags_from_id(soup, id, tag = "div", verbose = False):
     lists = soup.find_all(tag, id = id)
     return lists
 
 # <a class = anchor_class href = "***" ></a>
-def get_hrefs(soup, anchor_class, ui = False):
+def get_hrefs(soup, anchor_class, verbose = False):
     config = {"name" : "SoupMaster", "sub-name" : "get_hrefs", "screen-full" : True}
     printer = Printer()
     printer.addConfig(config)
@@ -107,12 +112,12 @@ def get_hrefs(soup, anchor_class, ui = False):
     return hrefs
 
 # <tag class = tag_class><a href = "***"></a></tag>
-def get_hrefs_from_tag_in_anchor(soup, class_, tag = "div", recursion = True, ui = False):
+def get_hrefs_from_tag_in_anchor(soup, class_, tag = "div", recursion = True, verbose = False):
     config = {"name" : "SoupMaster", "sub-name" : "get_hrefs_from_tag_in_anchor", "screen-full" : True}
     printer = Printer()
     printer.addConfig(config)
     # tag_class を持つ tag のリストを取得する
-    lists = get_tags_from_class(soup, class_ = class_, tag = tag, ui = ui)
+    lists = get_tags_from_class(soup, class_ = class_, tag = tag, verbose = ui)
     hrefs = []
     for li in lists:
         anchors = []
@@ -124,27 +129,27 @@ def get_hrefs_from_tag_in_anchor(soup, class_, tag = "div", recursion = True, ui
     return hrefs
 
 # <tag class = tag_class> **** </tag>
-def get_text_from_tag(soup, class_, tag = "div", ui = False):
+def get_text_from_tag(soup, class_, tag = "div", verbose = False):
     element = soup.find(tag, class_ = class_)
     return element.text
 
 # bs4.BeautifulSoup 型にして返す
-def elementTag2BeautifulSoup(data, ui = False):
+def elementTag2BeautifulSoup(data, verbose = False):
     string = ""
     string = str(data)
     soup = BeautifulSoup(string, 'lxml')
     return soup
 
 # href があるかどうかを判断する
-def exist_href(soup, anchor_class, ui = False):
-    hrefs = get_hrefs(soup, anchor_class, ui = False)
+def exist_href(soup, anchor_class, verbose = False):
+    hrefs = get_hrefs(soup, anchor_class, verbose = False)
     tof = False
     if not len(hrefs) == 0:
         tof = True
     return tof
 
 # URL の画像を表示する
-def show_image(url : str, title : str, scaling = 1, ui = False):
+def show_image(url : str, title : str, scaling = 1, verbose = False):
     config = {"name" : "SoupMaster", "sub-name" : "show_image", "screen-full" : True}
     printer = Printer()
     printer.addConfig(config)
@@ -166,7 +171,7 @@ def show_image(url : str, title : str, scaling = 1, ui = False):
         show_image(url, title, ui)
 
 # 画像のイメージを PIL.Image で取得
-def download_image_for_pil(url, sec = 1, ui = False):
+def download_image_for_pil(url, sec = 1, verbose = False):
     config = {"name" : "SoupMaster", "sub-name" : "download_image_for_pil", "screen-full" : True}
     printer = Printer()
     printer.addConfig(config)
@@ -200,7 +205,7 @@ def download_image_for_pil(url, sec = 1, ui = False):
             now = datetime.datetime.now()
             tmp_path = f"__{now.year: >4}{now.month:0>2}{now.day:0>2}{now.hour:0>2}{now.minute:0>2}{now.second:0>2}.png"
             # im.save(tmp_path, "PNG")
-            # fde.rm(tmp_path, "f", ui = ui)
+            # fde.rm(tmp_path, "f", verbose = ui)
             im = Image.open(image_data)
             return 0, im
     except UnidentifiedImageError as e:
@@ -212,7 +217,7 @@ def download_image_for_pil(url, sec = 1, ui = False):
         return -1, None
 
 # <a class="anchor_class"> <img src="***"> </a> の *** の部分をリスト化して取り出す
-def get_image_urls(soup, anchor_class, ui = False):
+def get_image_urls(soup, anchor_class, verbose = False):
     config = {"name" : "SoupMaster", "sub-name" : "get_image_urls", "screen-full" : True}
     printer = Printer()
     printer.addConfig(config)
@@ -274,7 +279,7 @@ def getHeaders():
     return headers
 
 # ファイルの種類によらず保存する
-def file_download(url, filename, count = 16, ui = False):
+def file_download(url, filename, count = 16, verbose = False):
     config = {"name" : "SoupMaster", "sub-name" : "file_download", "screen-full" : True}
     printer = Printer()
     printer.addConfig(config)
